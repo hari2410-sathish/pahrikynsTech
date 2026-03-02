@@ -30,7 +30,7 @@ export default function UserLoginOTPVerify() {
 
     setLoading(true);
     try {
-      const res = await verifyOTP(email, otp);
+      const res = await verifyOTP({ email, otp });
       login(res.data);
       showToast("Login successful!", "success");
 
