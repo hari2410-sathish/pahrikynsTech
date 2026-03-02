@@ -9,33 +9,40 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /* ===========================
    REGISTER USER (STEP 1)
+   OTP ONLY FOR REGISTER
 =========================== */
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password)
+    if (!name || !email || !password) {
       return res.status(400).json({ error: "Missing fields" });
+    }
 
     const exist = await prisma.user.findUnique({ where: { email } });
-    if (exist) return res.status(400).json({ error: "User already exists" });
+    if (exist) {
+      return res.status(400).json({ error: "User already exists" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
 
+    // Save temp user
     await prisma.tempUser.upsert({
       where: { email },
       update: { name, password: hashed },
       create: { name, email, password: hashed },
     });
 
-    // ✅ Clear old OTPs
+    // Clear old OTPs
     await prisma.otpStore.deleteMany({ where: { email } });
 
-    // ✅ Generate OTP
+    // Generate OTP
     const otp = await sendOTPEmail(email);
-    const otpHash = crypto.createHash("sha256").update(String(otp)).digest("hex");
+    const otpHash = crypto
+      .createHash("sha256")
+      .update(String(otp))
+      .digest("hex");
 
-    // ✅ Save HASHED OTP
     await prisma.otpStore.create({
       data: {
         email,
@@ -45,7 +52,7 @@ exports.registerUser = async (req, res) => {
       },
     });
 
-    // 🔔 REAL-TIME NOTIFICATION (OTP SENT / PENDING REGISTER)
+    // Socket notification
     const io = req.app.get("io");
     if (io) {
       io.emit("admin_notification", {
@@ -56,7 +63,11 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    res.json({ message: "OTP sent", requiresOTP: true, email });
+    res.json({
+      message: "OTP sent",
+      requiresOTP: true,
+      email,
+    });
   } catch (err) {
     console.error("registerUser error:", err);
     res.status(500).json({ error: "Server error" });
@@ -64,17 +75,33 @@ exports.registerUser = async (req, res) => {
 };
 
 /* ===========================
-   LOGIN USER (WITH NOTIFICATION)
+   LOGIN USER (PASSWORD ONLY)
+   ❌ OTP NOT USED HERE
 =========================== */
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+    }
+
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(400).json({ error: "User not found" });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    // 🔒 BLOCK UNVERIFIED USERS
+    if (!user.isVerified) {
+      return res.status(403).json({
+        error: "Please verify your email before login",
+      });
+    }
 
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(400).json({ error: "Invalid password" });
+    if (!ok) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -82,7 +109,7 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // 🔔 LOGIN NOTIFICATION (DB)
+    // DB notification
     await prisma.notification.create({
       data: {
         userId: user.id,
@@ -92,7 +119,7 @@ exports.loginUser = async (req, res) => {
       },
     });
 
-    // 🔔 REAL-TIME NOTIFICATION (SOCKET)
+    // Socket notification
     const io = req.app.get("io");
     if (io) {
       io.emit("admin_notification", {
@@ -103,7 +130,7 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    // ✅ UPDATE LOGIN STATS (Safe Mode)
+    // Update login stats (safe)
     try {
       await prisma.user.update({
         where: { id: user.id },
@@ -113,19 +140,21 @@ exports.loginUser = async (req, res) => {
           lastDevice: req.headers["user-agent"] || "Unknown",
         },
       });
-    } catch (statsErr) {
-      console.warn("Login stats update failed (Schema mismatch?):", statsErr.message);
+    } catch (e) {
+      console.warn("Login stats update failed:", e.message);
     }
 
-    const safeUser = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      isVerified: user.isVerified,
-      createdAt: user.createdAt,
-    };
-
-    res.json({ message: "Login successful", token, user: safeUser });
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+      },
+    });
   } catch (err) {
     console.error("loginUser error:", err);
     res.status(500).json({ error: "Server error" });
@@ -133,30 +162,37 @@ exports.loginUser = async (req, res) => {
 };
 
 /* ===========================
-   VERIFY OTP (STEP 2) → FINAL REGISTER + NOTIFICATION
+   VERIFY OTP (REGISTER ONLY)
 =========================== */
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    if (!email || !otp)
+    if (!email || !otp) {
       return res.status(400).json({ error: "Missing email or OTP" });
+    }
 
-    const otpHash = crypto.createHash("sha256").update(String(otp)).digest("hex");
+    const otpHash = crypto
+      .createHash("sha256")
+      .update(String(otp))
+      .digest("hex");
 
     const record = await prisma.otpStore.findFirst({
       where: { email, otpHash },
     });
 
-    if (!record)
+    if (!record) {
       return res.status(400).json({ error: "Invalid OTP" });
+    }
 
-    if (record.expiresAt < new Date())
+    if (record.expiresAt < new Date()) {
       return res.status(400).json({ error: "OTP expired" });
+    }
 
     const tempUser = await prisma.tempUser.findUnique({ where: { email } });
-    if (!tempUser)
+    if (!tempUser) {
       return res.status(400).json({ error: "Temp user not found" });
+    }
 
     const user = await prisma.user.create({
       data: {
@@ -170,7 +206,7 @@ exports.verifyOTP = async (req, res) => {
     await prisma.tempUser.delete({ where: { email } });
     await prisma.otpStore.deleteMany({ where: { email } });
 
-    // 🔔 REGISTER SUCCESS NOTIFICATION
+    // Notification
     await prisma.notification.create({
       data: {
         userId: user.id,
@@ -180,7 +216,6 @@ exports.verifyOTP = async (req, res) => {
       },
     });
 
-    // 🔔 REAL-TIME NOTIFICATION (SOCKET)
     const io = req.app.get("io");
     if (io) {
       io.emit("admin_notification", {
@@ -191,39 +226,22 @@ exports.verifyOTP = async (req, res) => {
       });
     }
 
-    // ✅ UPDATE LOGIN STATS (Safe Mode)
-    try {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          lastLoginAt: new Date(),
-          lastLoginIp: req.ip || req.connection.remoteAddress,
-          lastDevice: req.headers["user-agent"] || "Unknown",
-        },
-      });
-    } catch (statsErr) {
-      console.warn("Login stats update failed (Schema mismatch?):", statsErr.message);
-    }
-
-
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    const safeUser = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      isVerified: true,
-      createdAt: user.createdAt,
-    };
-
     res.json({
       message: "OTP verified successfully",
       token,
-      user: safeUser,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isVerified: true,
+        createdAt: user.createdAt,
+      },
     });
   } catch (err) {
     console.error("verifyOTP error:", err);
@@ -232,32 +250,32 @@ exports.verifyOTP = async (req, res) => {
 };
 
 /* ===========================
-   GOOGLE LOGIN (WITH NOTIFICATION)
+   GOOGLE LOGIN (AUTO VERIFIED)
 =========================== */
 exports.googleLogin = async (req, res) => {
   try {
     const { token } = req.body;
-
-    if (!token)
+    if (!token) {
       return res.status(400).json({ error: "Google token missing" });
+    }
 
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    const payload = ticket.getPayload();
-    const { email, name, picture } = payload;
-
-    if (!email)
+    const { email, name, picture } = ticket.getPayload();
+    if (!email) {
       return res.status(400).json({ error: "Google email missing" });
+    }
 
     let user = await prisma.user.findUnique({ where: { email } });
 
-    // ✅ NEW USER → AUTO REGISTER
     if (!user) {
-      const randomPass = crypto.randomBytes(16).toString("hex");
-      const hashed = await bcrypt.hash(randomPass, 10);
+      const hashed = await bcrypt.hash(
+        crypto.randomBytes(16).toString("hex"),
+        10
+      );
 
       user = await prisma.user.create({
         data: {
@@ -269,7 +287,6 @@ exports.googleLogin = async (req, res) => {
         },
       });
 
-      // 🔔 GOOGLE REGISTER NOTIFICATION
       await prisma.notification.create({
         data: {
           userId: user.id,
@@ -278,41 +295,6 @@ exports.googleLogin = async (req, res) => {
           type: "register",
         },
       });
-
-      // 🔔 REAL-TIME (SOCKET)
-      const io = req.app.get("io");
-      if (io) {
-        io.emit("admin_notification", {
-          title: "New Google User 🚀",
-          message: `${email} registered via Google!`,
-          type: "success",
-          timestamp: new Date(),
-        });
-      }
-    } else {
-      // 🔔 LOGIN NOTIFICATION (EXISTING USER)
-      await prisma.notification.create({
-        data: {
-          userId: user.id,
-          title: "New Google Login 🔐",
-          message: "You logged in via Google",
-          type: "login",
-        },
-      });
-    }
-
-    // ✅ UPDATE LOGIN STATS (Safe Mode)
-    try {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          lastLoginAt: new Date(),
-          lastLoginIp: req.ip || req.connection.remoteAddress,
-          lastDevice: req.headers["user-agent"] || "Unknown",
-        },
-      });
-    } catch (statsErr) {
-      console.warn("Login stats update failed (Schema mismatch?):", statsErr.message);
     }
 
     const jwtToken = jwt.sign(
@@ -321,18 +303,16 @@ exports.googleLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    const safeUser = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      isVerified: user.isVerified,
-      createdAt: user.createdAt,
-    };
-
     res.json({
       message: "Google login successful",
       token: jwtToken,
-      user: safeUser,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+      },
     });
   } catch (err) {
     console.error("Google Login Error:", err);
