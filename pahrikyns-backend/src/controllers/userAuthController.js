@@ -7,9 +7,20 @@ const { OAuth2Client } = require("google-auth-library");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// ===========================
+// SAFE SOCKET EMIT HELPER
+// ===========================
+function safeEmit(req, event, payload) {
+  try {
+    const io = req.app?.get("io");
+    if (io) io.emit(event, payload);
+  } catch (e) {
+    console.warn("Socket emit skipped:", e.message);
+  }
+}
+
 /* ===========================
    REGISTER USER (STEP 1)
-   OTP ONLY FOR REGISTER
 =========================== */
 exports.registerUser = async (req, res) => {
   try {
@@ -19,6 +30,7 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ error: "Missing fields" });
     }
 
+    // Already registered?
     const exist = await prisma.user.findUnique({ where: { email } });
     if (exist) {
       return res.status(400).json({ error: "User already exists" });
@@ -26,7 +38,7 @@ exports.registerUser = async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // Save temp user
+    // Save / update temp user
     await prisma.tempUser.upsert({
       where: { email },
       update: { name, password: hashed },
@@ -36,8 +48,17 @@ exports.registerUser = async (req, res) => {
     // Clear old OTPs
     await prisma.otpStore.deleteMany({ where: { email } });
 
-    // Generate OTP
-    const otp = await sendOTPEmail(email);
+    // Send OTP (SAFE)
+    let otp;
+    try {
+      otp = await sendOTPEmail(email);
+    } catch (mailErr) {
+      console.error("OTP mail failed:", mailErr.message);
+      return res.status(500).json({
+        error: "Unable to send OTP. Please try again later.",
+      });
+    }
+
     const otpHash = crypto
       .createHash("sha256")
       .update(String(otp))
@@ -52,16 +73,13 @@ exports.registerUser = async (req, res) => {
       },
     });
 
-    // Socket notification
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("admin_notification", {
-        title: "New Registration Attempt 📝",
-        message: `OTP sent to ${email}`,
-        type: "info",
-        timestamp: new Date(),
-      });
-    }
+    // Socket notify (SAFE)
+    safeEmit(req, "admin_notification", {
+      title: "New Registration Attempt 📝",
+      message: `OTP sent to ${email}`,
+      type: "info",
+      timestamp: new Date(),
+    });
 
     res.json({
       message: "OTP sent",
@@ -75,8 +93,7 @@ exports.registerUser = async (req, res) => {
 };
 
 /* ===========================
-   LOGIN USER (PASSWORD ONLY)
-   ❌ OTP NOT USED HERE
+   LOGIN USER
 =========================== */
 exports.loginUser = async (req, res) => {
   try {
@@ -91,11 +108,10 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ error: "User not found" });
     }
 
-    // 🔒 BLOCK UNVERIFIED USERS
     if (!user.isVerified) {
-      return res.status(403).json({
-        error: "Please verify your email before login",
-      });
+      return res
+        .status(403)
+        .json({ error: "Please verify your email before login" });
     }
 
     const ok = await bcrypt.compare(password, user.password);
@@ -109,40 +125,27 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // DB notification
-    await prisma.notification.create({
-      data: {
-        userId: user.id,
-        title: "Login Alert 🔐",
-        message: "You logged in successfully",
-        type: "login",
-      },
-    });
-
-    // Socket notification
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("admin_notification", {
-        title: "User Login 🟢",
-        message: `${user.email} just logged in.`,
-        type: "success",
-        timestamp: new Date(),
-      });
-    }
-
-    // Update login stats (safe)
+    // DB notification (SAFE)
     try {
-      await prisma.user.update({
-        where: { id: user.id },
+      await prisma.notification.create({
         data: {
-          lastLoginAt: new Date(),
-          lastLoginIp: req.ip || req.connection.remoteAddress,
-          lastDevice: req.headers["user-agent"] || "Unknown",
+          userId: user.id,
+          title: "Login Alert 🔐",
+          message: "You logged in successfully",
+          type: "login",
         },
       });
     } catch (e) {
-      console.warn("Login stats update failed:", e.message);
+      console.warn("Notification skipped:", e.message);
     }
+
+    // Socket notify
+    safeEmit(req, "admin_notification", {
+      title: "User Login 🟢",
+      message: `${user.email} logged in`,
+      type: "success",
+      timestamp: new Date(),
+    });
 
     res.json({
       message: "Login successful",
@@ -162,7 +165,7 @@ exports.loginUser = async (req, res) => {
 };
 
 /* ===========================
-   VERIFY OTP (REGISTER ONLY)
+   VERIFY OTP (STEP 2)
 =========================== */
 exports.verifyOTP = async (req, res) => {
   try {
@@ -206,25 +209,12 @@ exports.verifyOTP = async (req, res) => {
     await prisma.tempUser.delete({ where: { email } });
     await prisma.otpStore.deleteMany({ where: { email } });
 
-    // Notification
-    await prisma.notification.create({
-      data: {
-        userId: user.id,
-        title: "Welcome 🎉",
-        message: "Your account registered successfully!",
-        type: "register",
-      },
+    safeEmit(req, "admin_notification", {
+      title: "New User Registered 🚀",
+      message: `${user.email} joined`,
+      type: "success",
+      timestamp: new Date(),
     });
-
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("admin_notification", {
-        title: "New User Registered 🚀",
-        message: `${user.email} has joined the platform!`,
-        type: "success",
-        timestamp: new Date(),
-      });
-    }
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -250,7 +240,7 @@ exports.verifyOTP = async (req, res) => {
 };
 
 /* ===========================
-   GOOGLE LOGIN (AUTO VERIFIED)
+   GOOGLE LOGIN
 =========================== */
 exports.googleLogin = async (req, res) => {
   try {
@@ -284,15 +274,6 @@ exports.googleLogin = async (req, res) => {
           password: hashed,
           isVerified: true,
           avatar: picture || null,
-        },
-      });
-
-      await prisma.notification.create({
-        data: {
-          userId: user.id,
-          title: "Welcome via Google 🎉",
-          message: "Your account was created using Google",
-          type: "register",
         },
       });
     }
