@@ -1,9 +1,9 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/pahrikyns-backend/server.js b/pahrikyns-backend/server.js
-index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f246fe000 100644
+index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..d08bec1dad9460e798b4826b1b392b3b2c7c3544 100644
 --- a/pahrikyns-backend/server.js
 +++ b/pahrikyns-backend/server.js
-@@ -11,65 +11,105 @@ const validateEnvironment = require("./src/config/envValidator");
+@@ -11,65 +11,127 @@ const validateEnvironment = require("./src/config/envValidator");
  validateEnvironment();
  
  const express = require("express");
@@ -30,9 +30,10 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f
  
  // ============================
 -// 🔥 CORS — EC2 FIXED
-+// 🔥 CORS — flexible for prod + local
- // ============================
+-// ============================
 -const FRONTEND_URL = "http://54.226.206.161";
++// 🔥 CORS — flexible for prod + local
++// ============================
 +const defaultAllowedOrigins = [
 +  "http://54.226.206.161",
 +  "https://54.226.206.161",
@@ -72,21 +73,43 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f
 +  [...defaultAllowedOrigins, ...envAllowedOrigins].map((origin) =>
 +    normalizeOrigin(origin)
 +  )
++);
++
++const allowedHostnames = new Set(
++  [...allowedOrigins]
++    .map((origin) => {
++      try {
++        return new URL(origin).hostname;
++      } catch {
++        return null;
++      }
++    })
++    .filter(Boolean)
  );
  
++function isAllowedOrigin(origin) {
++  const normalized = normalizeOrigin(origin);
++  if (allowedOrigins.has(normalized)) return true;
++
++  try {
++    const hostname = new URL(normalized).hostname;
++    return allowedHostnames.has(hostname);
++  } catch {
++    return false;
++  }
++}
++
 +const corsOptions = {
 +  origin: (origin, callback) => {
 +    // allow Postman/curl/server-to-server requests with no origin header
 +    if (!origin) return callback(null, true);
 +
-+    const normalized = normalizeOrigin(origin);
-+    if (allowedOrigins.has(normalized)) return callback(null, true);
++    if (isAllowedOrigin(origin)) return callback(null, true);
 +
 +    return callback(new Error(`CORS blocked for origin: ${origin}`));
 +  },
 +  credentials: true,
 +  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-+  allowedHeaders: ["Content-Type", "Authorization"],
 +};
 +
 +app.use(cors(corsOptions));
@@ -119,7 +142,7 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f
    session({
      secret: process.env.SESSION_SECRET || "supersecret_session_key",
      resave: false,
-@@ -103,51 +143,56 @@ app.use("/courses", require("./src/routes/courseRoutes"));
+@@ -103,51 +165,55 @@ app.use("/courses", require("./src/routes/courseRoutes"));
  app.use("/api/notifications", notificationRoutes);
  app.use("/payments", require("./src/routes/paymentRoutes"));
  app.use("/api/chat", require("./src/routes/chatRoutes"));
@@ -148,8 +171,7 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f
 -    origin: FRONTEND_URL,
 +    origin: (origin, callback) => {
 +      if (!origin) return callback(null, true);
-+      const normalized = normalizeOrigin(origin);
-+      if (allowedOrigins.has(normalized)) return callback(null, true);
++      if (isAllowedOrigin(origin)) return callback(null, true);
 +      return callback(new Error(`Socket CORS blocked for origin: ${origin}`));
 +    },
      credentials: true,
