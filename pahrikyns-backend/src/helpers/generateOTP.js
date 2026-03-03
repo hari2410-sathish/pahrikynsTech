@@ -14,18 +14,32 @@ function generateOTP(length = 6) {
 async function sendOTPEmail(email) {
   const otp = generateOTP();
 
+  const mailHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+  const mailPort = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT || 587);
+  const mailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const mailPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+  const mailFrom = process.env.EMAIL_FROM || process.env.EMAIL_USER || mailUser;
+
+  if (!mailHost || !mailUser || !mailPass) {
+    throw new Error("SMTP is not configured (host/user/pass missing)");
+  }
+
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: false, // Gmail = false for TLS
+    host: mailHost,
+    port: mailPort,
+    // Port 465 expects implicit TLS. Others usually use STARTTLS.
+    secure: mailPort === 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: mailUser,
+      pass: mailPass,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+    from: mailFrom,
     to: email,
     subject: "Your OTP Verification Code",
     html: `
