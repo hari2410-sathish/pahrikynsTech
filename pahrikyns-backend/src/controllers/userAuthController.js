@@ -33,7 +33,9 @@ exports.registerUser = async (req, res) => {
     }
 
     // Already registered?
-    const exist = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    const exist = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
     if (exist) {
       return res.status(400).json({ error: "User already exists" });
     }
@@ -106,7 +108,9 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ error: "Email and password required" });
     }
 
-    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
@@ -120,6 +124,19 @@ exports.loginUser = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
       return res.status(400).json({ error: "Invalid password" });
+    }
+
+    // Self-heal legacy mixed-case emails in DB.
+    if (user.email !== normalizedEmail) {
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { email: normalizedEmail },
+        });
+        user.email = normalizedEmail;
+      } catch (e) {
+        console.warn("Email normalization skipped:", e.message);
+      }
     }
 
     const token = jwt.sign(
@@ -185,7 +202,10 @@ exports.verifyOTP = async (req, res) => {
       .digest("hex");
 
     const record = await prisma.otpStore.findFirst({
-      where: { email: normalizedEmail, otpHash },
+      where: {
+        email: { equals: normalizedEmail, mode: "insensitive" },
+        otpHash,
+      },
     });
 
     if (!record) {
@@ -196,7 +216,9 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ error: "OTP expired" });
     }
 
-    const tempUser = await prisma.tempUser.findUnique({ where: { email: normalizedEmail } });
+    const tempUser = await prisma.tempUser.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
     if (!tempUser) {
       return res.status(400).json({ error: "Temp user not found" });
     }
@@ -210,8 +232,12 @@ exports.verifyOTP = async (req, res) => {
       },
     });
 
-    await prisma.tempUser.delete({ where: { email: normalizedEmail } });
-    await prisma.otpStore.deleteMany({ where: { email: normalizedEmail } });
+    await prisma.tempUser.deleteMany({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
+    await prisma.otpStore.deleteMany({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
 
     safeEmit(req, "admin_notification", {
       title: "New User Registered 🚀",
@@ -264,7 +290,9 @@ exports.googleLogin = async (req, res) => {
       return res.status(400).json({ error: "Google email missing" });
     }
 
-    let user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    let user = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    });
 
     if (!user) {
       const hashed = await bcrypt.hash(
