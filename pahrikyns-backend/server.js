@@ -1,9 +1,9 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/pahrikyns-backend/server.js b/pahrikyns-backend/server.js
-index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..0cd7fc3fbadbcf64725fa26ab36580616bb831a7 100644
+index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..3d55b5a2c54a6cae88a6c557c5cec05f246fe000 100644
 --- a/pahrikyns-backend/server.js
 +++ b/pahrikyns-backend/server.js
-@@ -11,65 +11,81 @@ const validateEnvironment = require("./src/config/envValidator");
+@@ -11,65 +11,105 @@ const validateEnvironment = require("./src/config/envValidator");
  validateEnvironment();
  
  const express = require("express");
@@ -30,34 +30,15 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..0cd7fc3fbadbcf64725fa26ab3658061
  
  // ============================
 -// 🔥 CORS — EC2 FIXED
--// ============================
--const FRONTEND_URL = "http://54.226.206.161";
 +// 🔥 CORS — flexible for prod + local
-+// ============================
+ // ============================
+-const FRONTEND_URL = "http://54.226.206.161";
 +const defaultAllowedOrigins = [
 +  "http://54.226.206.161",
++  "https://54.226.206.161",
 +  "http://localhost:5173",
 +  "http://127.0.0.1:5173",
 +];
-+
-+const envAllowedOrigins = (process.env.FRONTEND_URL || "")
-+  .split(",")
-+  .map((origin) => origin.trim())
-+  .filter(Boolean);
-+
-+const allowedOrigins = new Set([...defaultAllowedOrigins, ...envAllowedOrigins]);
-+
-+const corsOptions = {
-+  origin: (origin, callback) => {
-+    // allow Postman/curl/server-to-server requests with no origin header
-+    if (!origin) return callback(null, true);
-+    if (allowedOrigins.has(origin)) return callback(null, true);
-+    return callback(new Error(`CORS blocked for origin: ${origin}`));
-+  },
-+  credentials: true,
-+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-+  allowedHeaders: ["Content-Type", "Authorization"],
-+};
  
 -app.use(
 -  cors({
@@ -66,9 +47,50 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..0cd7fc3fbadbcf64725fa26ab3658061
 -    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 -    allowedHeaders: ["Content-Type", "Authorization"],
 -  })
--);
-+app.use(cors(corsOptions));
++function normalizeOrigin(origin) {
++  try {
++    const parsed = new URL(origin);
++    return parsed.origin;
++  } catch {
++    return String(origin || "").trim().replace(/\/$/, "");
++  }
++}
++
++const envAllowedOriginsRaw = [
++  process.env.FRONTEND_URL,
++  process.env.FRONTEND_URLS,
++]
++  .filter(Boolean)
++  .join(",");
++
++const envAllowedOrigins = envAllowedOriginsRaw
++  .split(",")
++  .map((origin) => normalizeOrigin(origin))
++  .filter(Boolean);
++
++const allowedOrigins = new Set(
++  [...defaultAllowedOrigins, ...envAllowedOrigins].map((origin) =>
++    normalizeOrigin(origin)
++  )
+ );
  
++const corsOptions = {
++  origin: (origin, callback) => {
++    // allow Postman/curl/server-to-server requests with no origin header
++    if (!origin) return callback(null, true);
++
++    const normalized = normalizeOrigin(origin);
++    if (allowedOrigins.has(normalized)) return callback(null, true);
++
++    return callback(new Error(`CORS blocked for origin: ${origin}`));
++  },
++  credentials: true,
++  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
++  allowedHeaders: ["Content-Type", "Authorization"],
++};
++
++app.use(cors(corsOptions));
++
  // Preflight
 -app.options("*", cors());
 +app.options("*", cors(corsOptions));
@@ -97,7 +119,7 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..0cd7fc3fbadbcf64725fa26ab3658061
    session({
      secret: process.env.SESSION_SECRET || "supersecret_session_key",
      resave: false,
-@@ -103,51 +119,51 @@ app.use("/courses", require("./src/routes/courseRoutes"));
+@@ -103,51 +143,56 @@ app.use("/courses", require("./src/routes/courseRoutes"));
  app.use("/api/notifications", notificationRoutes);
  app.use("/payments", require("./src/routes/paymentRoutes"));
  app.use("/api/chat", require("./src/routes/chatRoutes"));
@@ -124,7 +146,12 @@ index a93db127c6e34b4c6c1782a9c0a19e5f64790e9d..0cd7fc3fbadbcf64725fa26ab3658061
  const io = new Server(server, {
    cors: {
 -    origin: FRONTEND_URL,
-+    origin: [...allowedOrigins],
++    origin: (origin, callback) => {
++      if (!origin) return callback(null, true);
++      const normalized = normalizeOrigin(origin);
++      if (allowedOrigins.has(normalized)) return callback(null, true);
++      return callback(new Error(`Socket CORS blocked for origin: ${origin}`));
++    },
      credentials: true,
    },
  });
