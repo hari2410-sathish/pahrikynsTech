@@ -247,7 +247,17 @@ export default function MainNavbar() {
           transition: "0.25s ease",
         }}
       >
-        <Toolbar sx={{ maxWidth: 1400, mx: "auto", width: "100%" }}>
+        <Toolbar
+          sx={{
+            maxWidth: 1400,
+            mx: "auto",
+            width: "100%",
+            minHeight: `${NAV_HEIGHT}px !important`,
+            px: { xs: 1, sm: 2, md: 3 },
+            gap: { xs: 1, md: 1.5 },
+            overflow: "hidden",
+          }}
+        >
           {/* LEFT */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Box
@@ -271,7 +281,7 @@ export default function MainNavbar() {
             </Box>
           </Box>
 
-          <Box>
+          <Box sx={{ display: { xs: "none", lg: "flex" }, alignItems: "center" }}>
             <Button component={Link} to="/" sx={navBtn}>
               Home
             </Button>
@@ -297,8 +307,8 @@ export default function MainNavbar() {
             </Button>
           </Box>
           <Button
-            ref={resumeBtnRef}   // ✅ THIS LINE IMPORTANT
-            sx={navBtn}
+            ref={resumeBtnRef}
+            sx={{ ...navBtn, display: { xs: "none", lg: "inline-flex" } }}
             onMouseEnter={() => {
               clearCloseTimer();
               setActive("resume");
@@ -316,19 +326,28 @@ export default function MainNavbar() {
           <Box sx={{ flex: 1 }} />
 
           {/* RIGHT */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 0.5, sm: 1 },
+              minWidth: 0,
+              flexShrink: 0,
+            }}
+          >
             {/* SEARCH */}
             <ClickAwayListener onClickAway={closeSearch}>
               <Box
                 sx={{
+                  display: { xs: "none", md: "flex" },
                   position: "relative", // Needed for absolute positioning of results
-                  display: "flex",
                   alignItems: "center",
                   background: "rgba(68, 31, 201, 0.03)",
                   px: 1,
                   py: 0.45,
                   borderRadius: 1,
-                  minWidth: 300,
+                  width: { md: 240, lg: 280, xl: 320 },
+                  minWidth: 0,
                   transition: "0.25s",
                   "&:focus-within": {
                     boxShadow: "0 0 12px rgba(243, 238, 239, 0.28)",
@@ -510,14 +529,25 @@ export default function MainNavbar() {
                 <Button
                   component={Link}
                   to="/login"
-                  sx={{ bgcolor: "#1ed86cff", color: "#fff" }}
+                  sx={{
+                    bgcolor: "#1ed86cff",
+                    color: "#fff",
+                    px: { xs: 1.2, sm: 1.8 },
+                    fontSize: { xs: 12, sm: 14 },
+                  }}
                 >
                   LOGIN
                 </Button>
                 <Button
                   component={Link}
                   to="/register"
-                  sx={{ bgcolor: "#03bd50ff", color: "#001" }}
+                  sx={{
+                    bgcolor: "#03bd50ff",
+                    color: "#001",
+                    px: { xs: 1.2, sm: 1.8 },
+                    fontSize: { xs: 12, sm: 14 },
+                    display: { xs: "none", sm: "inline-flex" },
+                  }}
                 >
                   REGISTER
                 </Button>
@@ -560,7 +590,7 @@ export default function MainNavbar() {
             )}
 
             <IconButton
-              sx={{ display: { md: "none" } }}
+              sx={{ display: { xs: "inline-flex", lg: "none" } }}
               onClick={() => setDrawer(true)}
             >
               <MenuIcon />
