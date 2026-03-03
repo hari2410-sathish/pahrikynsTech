@@ -69,31 +69,9 @@ const allowedOrigins = new Set(
   )
 );
 
-const allowedHostnames = new Set(
-  [...allowedOrigins]
-    .map((origin) => {
-      try {
-        return new URL(origin).hostname;
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean)
-);
-
 function isAllowedOrigin(origin) {
   const normalized = normalizeOrigin(origin);
-
-  if (allowedOrigins.has(normalized)) {
-    return true;
-  }
-
-  try {
-    const hostname = new URL(normalized).hostname;
-    return allowedHostnames.has(hostname);
-  } catch {
-    return false;
-  }
+  return allowedOrigins.has(normalized);
 }
 
 const corsOptions = {
@@ -111,6 +89,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
