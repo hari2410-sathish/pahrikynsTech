@@ -109,7 +109,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.email || !form.password) {
+    const cleanEmail = form.email.trim().toLowerCase();
+    const cleanPassword = form.password;
+
+    if (!cleanEmail || !cleanPassword) {
       showToast("Please enter email & password");
       return;
     }
@@ -119,7 +122,8 @@ export default function Login() {
       const device = getDeviceInfo();
 
       const res = await loginUser({
-        ...form,
+        email: cleanEmail,
+        password: cleanPassword,
         device,
         role: isAdmin ? "admin" : "user",
       });
@@ -132,7 +136,7 @@ export default function Login() {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      showToast("Invalid email or password");
+      showToast(err?.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }

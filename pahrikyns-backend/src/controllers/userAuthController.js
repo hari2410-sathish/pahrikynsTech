@@ -25,13 +25,15 @@ function safeEmit(req, event, payload) {
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedName = String(name || "").trim();
 
-    if (!name || !email || !password) {
+    if (!normalizedName || !normalizedEmail || !password) {
       return res.status(400).json({ error: "Missing fields" });
     }
 
     // Already registered?
-    const exist = await prisma.user.findUnique({ where: { email } });
+    const exist = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (exist) {
       return res.status(400).json({ error: "User already exists" });
     }
@@ -40,18 +42,18 @@ exports.registerUser = async (req, res) => {
 
     // Save / update temp user
     await prisma.tempUser.upsert({
-      where: { email },
-      update: { name, password: hashed },
-      create: { name, email, password: hashed },
+      where: { email: normalizedEmail },
+      update: { name: normalizedName, password: hashed },
+      create: { name: normalizedName, email: normalizedEmail, password: hashed },
     });
 
     // Clear old OTPs
-    await prisma.otpStore.deleteMany({ where: { email } });
+    await prisma.otpStore.deleteMany({ where: { email: normalizedEmail } });
 
     // Send OTP (SAFE)
     let otp;
     try {
-      otp = await sendOTPEmail(email);
+      otp = await sendOTPEmail(normalizedEmail);
     } catch (mailErr) {
       console.error("OTP mail failed:", mailErr.message);
       return res.status(500).json({
@@ -66,7 +68,7 @@ exports.registerUser = async (req, res) => {
 
     await prisma.otpStore.create({
       data: {
-        email,
+        email: normalizedEmail,
         otpHash,
         method: "email",
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
@@ -76,7 +78,7 @@ exports.registerUser = async (req, res) => {
     // Socket notify (SAFE)
     safeEmit(req, "admin_notification", {
       title: "New Registration Attempt 📝",
-      message: `OTP sent to ${email}`,
+      message: `OTP sent to ${normalizedEmail}`,
       type: "info",
       timestamp: new Date(),
     });
@@ -84,7 +86,7 @@ exports.registerUser = async (req, res) => {
     res.json({
       message: "OTP sent",
       requiresOTP: true,
-      email,
+      email: normalizedEmail,
     });
   } catch (err) {
     console.error("registerUser error:", err);
@@ -98,12 +100,13 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ error: "Email and password required" });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
@@ -170,8 +173,9 @@ exports.loginUser = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!email || !otp) {
+    if (!normalizedEmail || !otp) {
       return res.status(400).json({ error: "Missing email or OTP" });
     }
 
@@ -181,7 +185,7 @@ exports.verifyOTP = async (req, res) => {
       .digest("hex");
 
     const record = await prisma.otpStore.findFirst({
-      where: { email, otpHash },
+      where: { email: normalizedEmail, otpHash },
     });
 
     if (!record) {
@@ -192,7 +196,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ error: "OTP expired" });
     }
 
-    const tempUser = await prisma.tempUser.findUnique({ where: { email } });
+    const tempUser = await prisma.tempUser.findUnique({ where: { email: normalizedEmail } });
     if (!tempUser) {
       return res.status(400).json({ error: "Temp user not found" });
     }
@@ -206,8 +210,8 @@ exports.verifyOTP = async (req, res) => {
       },
     });
 
-    await prisma.tempUser.delete({ where: { email } });
-    await prisma.otpStore.deleteMany({ where: { email } });
+    await prisma.tempUser.delete({ where: { email: normalizedEmail } });
+    await prisma.otpStore.deleteMany({ where: { email: normalizedEmail } });
 
     safeEmit(req, "admin_notification", {
       title: "New User Registered 🚀",
@@ -255,11 +259,12 @@ exports.googleLogin = async (req, res) => {
     });
 
     const { email, name, picture } = ticket.getPayload();
-    if (!email) {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail) {
       return res.status(400).json({ error: "Google email missing" });
     }
 
-    let user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
     if (!user) {
       const hashed = await bcrypt.hash(
@@ -270,7 +275,7 @@ exports.googleLogin = async (req, res) => {
       user = await prisma.user.create({
         data: {
           name,
-          email,
+          email: normalizedEmail,
           password: hashed,
           isVerified: true,
           avatar: picture || null,
