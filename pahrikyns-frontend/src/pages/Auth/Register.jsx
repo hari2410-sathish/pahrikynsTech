@@ -120,19 +120,29 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.password) {
+    const cleanName = form.name.trim();
+    const cleanEmail = form.email.trim().toLowerCase();
+    const cleanPassword = form.password;
+
+    if (!cleanName || !cleanEmail || !cleanPassword) {
       showToast("Please fill all fields");
       return;
     }
 
-    if (form.password.length < 6) {
+    if (cleanPassword.length < 6) {
       showToast("Password must be at least 6 characters");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await registerUser(form);
+      const res = await registerUser({
+        name: cleanName,
+        email: cleanEmail,
+        password: cleanPassword,
+      });
+
+      setForm((prev) => ({ ...prev, name: cleanName, email: cleanEmail }));
 
       if (res.data?.requiresOTP) {
         showToast("OTP sent to your email", "success");
@@ -161,7 +171,7 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await verifyOTP({
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         otp,
       });
 
@@ -180,7 +190,7 @@ export default function Register() {
 
   const handleResend = async () => {
     try {
-      await resendOTP({ email: form.email });
+      await resendOTP({ email: form.email.trim().toLowerCase() });
       showToast("OTP resent successfully!", "success");
     } catch {
       showToast("Failed to resend OTP");
