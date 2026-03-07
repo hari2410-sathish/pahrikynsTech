@@ -1,10 +1,9 @@
 // src/pages/Courses/ToolPage.jsx
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { loadAllLessons } from "./index";
 import axios from "../../api/axios";
-import RazorpayButton from "../../components/common/RazorpayButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { Box, Typography, Button, Chip, Container, Grid, Paper, LinearProgress } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -34,12 +33,8 @@ const progressKey = (category, tool, lessonNum) =>
 
 const readProgress = (c, t, n) =>
   Number(localStorage.getItem(progressKey(c, t, n))) || 0;
-const writeProgress = (c, t, n, v) =>
-  localStorage.setItem(progressKey(c, t, n), String(v));
-
 export default function ToolPage() {
   const { category, tool } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [rawLessons, setRawLessons] = useState([]);
@@ -49,7 +44,6 @@ export default function ToolPage() {
   // ACCESS STATE
   const [course, setCourse] = useState(null);
   const [access, setAccess] = useState(false);
-  const [loadingAccess, setLoadingAccess] = useState(true);
 
   // ---------------------------
   // LOAD COURSE ACCESS
@@ -57,40 +51,24 @@ export default function ToolPage() {
   useEffect(() => {
     async function checkAccess() {
       try {
-        setLoadingAccess(true);
         // 1. Fetch Course Info
         const { data: courseData } = await axios.get(`/courses/${tool}`);
         setCourse(courseData);
 
-        // 2. If no user, only Beginner is free
+        // 2. Login-only access model
         if (!user) {
-          if (courseData.level === "Beginner" || courseData.price === 0) {
-            // Double check price logic alongside level logic if needed, 
-            // but for now relying on what was established.
-            // Actually access controller uses PRICE now.
-            if (courseData.price === 0) {
-              setAccess(true);
-            } else {
-              setAccess(false);
-            }
-          } else {
-            setAccess(false);
-          }
-          setLoadingAccess(false);
+          setAccess(false);
           return;
         }
 
-        // 3. Authenticated User - Check Access
-        const { data: accessData } = await axios.get(
-          `/courses/${courseData.id}/access`
-        );
-        setAccess(accessData.access);
+        // 3. Any logged-in user can access all course content
+        setAccess(true);
 
       } catch (err) {
         console.error("Failed to load course/access", err);
         setAccess(false);
       } finally {
-        setLoadingAccess(false);
+        // no-op
       }
     }
     checkAccess();
@@ -251,18 +229,23 @@ export default function ToolPage() {
                       Login to Access
                     </Button>
                   ) : (
-                    <Box>
-                      {course?.price === 0 ? (
-                        <Button variant="contained" color="success" onClick={() => setAccess(true)}>Enroll For Free</Button>
-                      ) : (
-                        <RazorpayButton
-                          courseId={course?.id}
-                          courseTitle={course?.title || tool}
-                          user={user}
-                          onSuccess={() => window.location.reload()}
-                        />
-                      )}
-                    </Box>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      startIcon={<PlayArrowIcon />}
+                      component={Link}
+                      to={`/courses/${category}/${tool}/lesson1`}
+                      sx={{
+                        background: "#00eaff",
+                        color: "#0f172a",
+                        fontWeight: 800,
+                        px: 4,
+                        py: 1.5,
+                        ":hover": { background: "#00c4d6" }
+                      }}
+                    >
+                      Start Course
+                    </Button>
                   )
                 )}
               </Box>
@@ -289,11 +272,9 @@ export default function ToolPage() {
         </Typography>
 
         <Grid container spacing={3}>
-          {rawLessons.map((l, i) => {
+          {rawLessons.map((l) => {
             const prog = progressMap[l.num] || 0;
             const isCompleted = prog >= 100;
-            const isLocked = !access && i > 0; // Assuming first lesson might be preview, or strictly all locked? 
-            // Actually strictly locked if access is false.
             const actuallyLocked = !access;
 
             return (
@@ -362,21 +343,17 @@ export default function ToolPage() {
       {!access && user && (
         <Box textAlign="center" py={8} bgcolor="rgba(0,234,255,0.02)">
           <Typography variant="h4" fontWeight={900} mb={2}>Ready to Master {tool.toUpperCase()}?</Typography>
-          <Typography mb={4} color="rgba(255,255,255,0.6)">Join thousands of students learning {tool} today.</Typography>
-          <Box>
-            {course?.price > 0 ? (
-              <RazorpayButton
-                courseId={course?.id}
-                courseTitle={course?.title || tool}
-                user={user}
-                onSuccess={() => window.location.reload()}
-              />
-            ) : (
-              <Button variant="contained" size="large" onClick={() => setAccess(true)} sx={{ bgcolor: "#00eaff", color: "black", fontWeight: 700 }}>
-                Enroll for Free
-              </Button>
-            )}
-          </Box>
+          <Typography mb={4} color="rgba(255,255,255,0.6)">You are logged in. Start learning now.</Typography>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<PlayArrowIcon />}
+            component={Link}
+            to={`/courses/${category}/${tool}/lesson1`}
+            sx={{ bgcolor: "#00eaff", color: "black", fontWeight: 700 }}
+          >
+            Start Course
+          </Button>
         </Box>
       )}
 

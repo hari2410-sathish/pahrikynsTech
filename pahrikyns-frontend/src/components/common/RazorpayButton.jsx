@@ -11,6 +11,11 @@ export default function RazorpayButton({
   const [loading, setLoading] = useState(false);
 
   const handlePay = async () => {
+    if (!courseId) {
+      alert("❌ Course details are still loading. Please try again in a moment.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -20,7 +25,7 @@ export default function RazorpayButton({
         { courseId }
       );
 
-      const { orderId, amount, currency, key } = data;
+      const { amount, currency, key } = data;
 
       // 2️⃣ Razorpay options
       const options = {
@@ -73,7 +78,7 @@ export default function RazorpayButton({
     <Button
       variant="contained"
       onClick={handlePay}
-      disabled={loading}
+      disabled={loading || !courseId}
       sx={{
         background: "linear-gradient(90deg,#00eaff,#7b3fe4)",
         fontWeight: 700,

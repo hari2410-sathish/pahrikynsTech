@@ -4,7 +4,6 @@ import { loadAllLessons } from "./index";
 import LessonSidebar from "../../components/Course/LessonSidebar";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-import axios from "../../api/axios";
 
 export default function LessonViewer() {
   const { category, tool, lessonId } = useParams();
@@ -13,8 +12,6 @@ export default function LessonViewer() {
 
   const [lessons, setLessons] = useState([]);
   const [lesson, setLesson] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [checkingAccess, setCheckingAccess] = useState(true);
 
   const { langKey, changeLang } = useLanguage();
 
@@ -24,84 +21,25 @@ export default function LessonViewer() {
     tl: "Tanglish",
   };
 
+  const checkingAccess = !user;
+
   // ---------------- ACCESS PROTECTION ----------------
   useEffect(() => {
-    async function protect() {
-      try {
-        // Parse lesson number (e.g., "lesson1" -> 1)
-        const lessonNum = parseInt(lessonId.replace("lesson", ""), 10);
-
-        // ✅ 1. Lesson 1 is FREE & PUBLIC
-        if (lessonNum === 1) {
-          setCheckingAccess(false);
-          return;
-        }
-
-        // 🔒 2. Lesson 2 requires LOGIN (but no subscription)
-        if (lessonNum === 2) {
-          if (!user) {
-            // Redirect to login, but remember where they were
-            navigate("/login?redirect=" + encodeURIComponent(`/courses/${category}/${tool}/${lessonId}`));
-            return;
-          }
-          setCheckingAccess(false);
-          return;
-        }
-
-        // 💰 3. Lesson 3+ requires SUBSCRIPTION (Paid)
-        // If not logged in, go to login
-        if (!user) {
-          navigate("/login?redirect=" + encodeURIComponent(`/courses/${category}/${tool}/${lessonId}`));
-          return;
-        }
-
-        // Get course info to check price/access
-        const { data: course } = await axios.get(`/courses/${tool}`);
-
-        // If course is free (price 0), allow access
-        if (course.price === 0) {
-          setCheckingAccess(false);
-          return;
-        }
-
-        // Check if user has paid access
-        const { data } = await axios.get(`/courses/${course.id}/access`);
-        if (!data.access) {
-          // No access? Redirect to course home page to buy
-          navigate(`/courses/${category}/${tool}`);
-          return;
-        }
-
-        setCheckingAccess(false);
-      } catch (err) {
-        console.error("Access protection error:", err);
-        // Fallback: redirects to course home if something fails
-        navigate(`/courses/${category}/${tool}`);
-      }
+    if (!user) {
+      navigate("/login?redirect=" + encodeURIComponent(`/courses/${category}/${tool}/${lessonId}`));
     }
-
-    protect();
   }, [tool, category, lessonId, user, navigate]);
 
   // ---------------- PROGRESS STORAGE ----------------
-  const readProgress = (num) => {
-    try {
-      const v = localStorage.getItem(
-        `pahrikyns:progress:${category}:${tool}:lesson${num}`
-      );
-      return v ? Number(v) : 0;
-    } catch {
-      return 0;
-    }
-  };
-
   const writeProgress = (num, val) => {
     try {
       localStorage.setItem(
         `pahrikyns:progress:${category}:${tool}:lesson${num}`,
         String(val)
       );
-    } catch { }
+    } catch (error) {
+      console.error("writeProgress error:", error);
+    }
   };
 
   // ---------------- LOAD LESSON ----------------
@@ -117,7 +55,6 @@ export default function LessonViewer() {
 
       if (found) {
         setLesson(found);
-        setProgress(readProgress(found.num));
       }
     }
 
@@ -142,7 +79,6 @@ export default function LessonViewer() {
       100,
       Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100)
     );
-    setProgress(percent);
     writeProgress(lesson.num, percent);
   };
 
