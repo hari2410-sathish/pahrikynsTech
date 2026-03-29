@@ -1,0 +1,377 @@
+const prisma = require("../config/prismaClient");
+const generateInvoiceNumber = require("../helpers/generateInvoiceNumber");
+const { generateInvoicePDF } = require("../utils/generateInvoicePDF");
+const { sendMail } = require("../config/email");
+const path = require("path");
+const fs = require("fs");
+
+/* ================================
+   CREATE ORDER
+================================ */
+exports.createOrder = async (req, res) => {
+  try {
+    const {
+      customerType,
+      customer,
+      customerEmail,
+      fulfillment,
+      address,
+      paymentMethod,
+      totalAmount,
+      gstAmount,
+      grandTotal,
+      items,
+    } = req.body;
+
+    if (!customer || !items || items.length === 0) {
+      return res.status(400).json({ message: "Invalid order data" });
+    }
+
+    const invoiceNumber = await generateInvoiceNumber();
+
+    const order = await prisma.order.create({
+      data: {
+        customerType,
+        customer,
+        customerEmail: customerEmail || null,
+        fulfillment,
+        address: fulfillment === "delivery" ? address : null,
+        paymentMethod,
+        totalAmount,
+        gstAmount,
+        grandTotal,
+        invoiceNumber,
+        status: "CREATED",
+        paymentStatus: "PENDING",
+        items: {
+          create: items.map((i) => ({
+            product: i.product,
+            quantity: i.quantity,
+            price: i.price,
+          })),
+        },
+      },
+      include: { items: true },
+    });
+
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error("Create order error:", err);
+    res.status(500).json({ message: "Failed to create order" });
+  }
+};
+
+/* ================================
+   FETCH ALL ORDERS
+================================ */
+/* ================================
+   FETCH ALL ORDERS (WITH FILTER & PAGINATION)
+================================ */
+exports.getOrders = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status, // CREATED, PAID, FAILED, etc.
+      paymentStatus, // PENDING, PAID, REFUNDED
+      hasInvoice, // "true" or "false"
+      startDate,
+      endDate,
+    } = req.query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const take = parseInt(limit);
+
+    // 1️⃣ Build Where Clause
+    const where = {};
+
+    if (status) where.status = status;
+    if (paymentStatus) where.paymentStatus = paymentStatus;
+
+    if (hasInvoice === "true") {
+      where.invoiceNumber = { not: null };
+    }
+
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) where.createdAt.gte = new Date(startDate);
+      if (endDate) where.createdAt.lte = new Date(endDate);
+    }
+
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: "insensitive" } },
+        { invoiceNumber: { contains: search, mode: "insensitive" } },
+        { customer: { contains: search, mode: "insensitive" } },
+        { customerEmail: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // 2️⃣ Fetch Data
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        take,
+        skip,
+        include: { items: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.order.count({ where }),
+    ]);
+
+    // 3️⃣ Return
+        res.json({
+            success: true,
+            orders,
+            total,
+            totalPages: Math.ceil(total / take),
+            currentPage: parseInt(page),
+        });
+    } catch (err) {
+        console.error("getOrders error:", err);
+        res.status(500).json({ message: "Failed to fetch orders" });
+    }
+};
+
+/**
+ * GET ORDER STATS
+ */
+exports.getOrderStats = async (req, res) => {
+    try {
+        const total = await prisma.order.count();
+        const pending = await prisma.order.count({ where: { status: "CREATED" } });
+        const revenueData = await prisma.order.aggregate({
+            where: { paymentStatus: "PAID" },
+            _sum: { grandTotal: true }
+        });
+        const revenue = revenueData._sum.grandTotal || 0;
+        
+        res.json({ total, pending, revenue });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to fetch order stats" });
+    }
+};
+
+/* ================================
+   FETCH SINGLE ORDER
+================================ */
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: req.params.id },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ order });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch order" });
+  }
+};
+
+/* ================================
+   UPDATE ORDER STATUS
+================================ */
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const order = await prisma.order.update({
+      where: { id: req.params.id },
+      data: { status },
+      include: { items: true }, // Needed for unlocking
+    });
+
+    // ✅ AUTO-UNLOCK COURSES ON APPROVAL
+    if (status === "COMPLETED") {
+      // 1. Find User
+      const user = await prisma.user.findUnique({
+        where: { email: order.customerEmail },
+      });
+
+      if (user) {
+        // 2. Unlock each item
+        for (const item of order.items) {
+          // Fuzzy match course by title
+          const course = await prisma.course.findFirst({
+            where: { title: { equals: item.product, mode: "insensitive" } },
+          });
+
+          if (course) {
+            await prisma.userCourse.upsert({
+              where: {
+                userId_courseId: {
+                  userId: user.id,
+                  courseId: course.id,
+                },
+              },
+              update: { paid: true },
+              create: {
+                userId: user.id,
+                courseId: course.id,
+                paid: true,
+              },
+            });
+            console.log(`✅ Unlocked ${course.title} for ${user.email}`);
+          }
+        }
+      }
+    }
+
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error("Update Status Error:", err);
+    res.status(500).json({ message: "Failed to update status" });
+  }
+};
+
+/* ================================
+   CANCEL ORDER
+================================ */
+exports.cancelOrder = async (req, res) => {
+  try {
+    await prisma.order.update({
+      where: { id: req.params.id },
+      data: {
+        status: "CANCELLED",
+        paymentStatus: "FAILED",
+      },
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Cancel order error:", err);
+    res.status(500).json({ message: "Failed to cancel order" });
+  }
+};
+
+/* ================================
+   EMAIL / RESEND INVOICE ✅
+================================ */
+/* ================================
+   EMAIL / RESEND INVOICE
+================================ */
+exports.emailInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (!order.customerEmail) {
+      return res
+        .status(400)
+        .json({ message: "Customer email not available" });
+    }
+
+    const invoiceDir = path.join(__dirname, "../uploads/invoices");
+    if (!fs.existsSync(invoiceDir)) {
+      fs.mkdirSync(invoiceDir, { recursive: true });
+    }
+
+    const invoicePath = path.join(
+      invoiceDir,
+      `${order.invoiceNumber}.pdf`
+    );
+
+    // ✅ Generate again (overwrite safe)
+    await generateInvoicePDF(order, invoicePath);
+
+    // ✅ SEND / RESEND EMAIL
+    await sendMail({
+      to: order.customerEmail,
+      subject: `Invoice ${order.invoiceNumber}`,
+      text: `
+Hi ${order.customer},
+
+Please find attached your invoice.
+
+Invoice Number: ${order.invoiceNumber}
+Amount: ₹${order.grandTotal || order.totalAmount}
+
+Thank you,
+Pahrikyns Team
+      `,
+      attachments: [
+        {
+          filename: `${order.invoiceNumber}.pdf`,
+          path: invoicePath,
+        },
+      ],
+    });
+
+    return res.json({
+      success: true,
+      message: "Invoice email sent successfully",
+    });
+  } catch (err) {
+    console.error("Email invoice error:", err);
+    return res.status(500).json({
+      message: "Failed to send invoice email",
+    });
+  }
+};
+exports.resendInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (!order.customerEmail) {
+      return res.status(400).json({ message: "Customer email missing" });
+    }
+
+    const invoiceDir = path.join(__dirname, "../uploads/invoices");
+    if (!fs.existsSync(invoiceDir)) {
+      fs.mkdirSync(invoiceDir, { recursive: true });
+    }
+
+    const invoicePath = path.join(
+      invoiceDir,
+      `${order.invoiceNumber}.pdf`
+    );
+
+    // 🔁 regenerate just to be safe
+    await generateInvoicePDF(order, invoicePath);
+
+    await sendMail({
+      to: order.customerEmail,
+      subject: `Invoice ${order.invoiceNumber} (Resent)`,
+      text: `Invoice ${order.invoiceNumber} is attached.`,
+      html: `
+        <h3>Invoice Resent</h3>
+        <p>Hello ${order.customer},</p>
+        <p>Please find your invoice <b>${order.invoiceNumber}</b> attached.</p>
+        <p>— PAHRIKYNS</p>
+      `,
+      attachments: [
+        {
+          filename: `${order.invoiceNumber}.pdf`,
+          path: invoicePath,
+        },
+      ],
+    });
+
+    res.json({ success: true, message: "Invoice email resent" });
+  } catch (err) {
+    console.error("Resend invoice error:", err);
+    res.status(500).json({ message: "Failed to resend invoice" });
+  }
+};

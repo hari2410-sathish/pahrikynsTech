@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "AWS Basics – Lesson 2: Public vs Private Cloud",
+    "description": "Understanding Cloud Deployment Models: Public, Private, and Hybrid Clouds explained with simple analogies.",
+    "difficulty": "Beginner",
+    "duration": "45 min",
+    "tags": [
+      "aws",
+      "cloud-deployment",
+      "architectures"
+    ],
+    "updated": "2026-02-19"
+  },
+  "hero": {
+    "heading": "Cloud Deployment Models",
+    "subheading": "Public vs Private vs Hybrid",
+    "intro": "Understand where your servers live: Are they shared (Bus) or private (Car)?"
+  },
+  "sections": [
+    {
+      "id": "public-cloud",
+      "title": "Public Cloud",
+      "content": [
+        "Infrastructure is owned by AWS and shared by everyone.",
+        "Analogy: Public Bus. Cheap, shared, but you don't control the route.",
+        "Tanglish: Share auto maari. Cost kammi, but seat share pannanum."
+      ]
+    },
+    {
+      "id": "private-cloud",
+      "title": "Private Cloud",
+      "content": [
+        "Infrastructure is dedicated to YOU only.",
+        "Analogy: Own Car. Expensive, secure, full freedom.",
+        "Tanglish: Own Car maari. Cost athigam, but full control nammakku thaan."
+      ]
+    },
+    {
+      "id": "hybrid-cloud",
+      "title": "Hybrid Cloud",
+      "content": [
+        "Using both Public and Private together.",
+        "Keep secure data private, run website on public.",
+        "Analogy: Renting a car for trips (Public) + Owning a bike for local (Private)."
+      ]
+    }
+  ],
+  "summary": [
+    "Public Cloud = Shared (AWS).",
+    "Private Cloud = Dedicated (On-Premise).",
+    "Hybrid Cloud = Best of both worlds."
+  ],
+  "quiz": [
+    {
+      "question": "Which cloud model is like a Public Bus?",
+      "options": [
+        "Public Cloud",
+        "Private Cloud",
+        "Hybrid Cloud",
+        "Rain Cloud"
+      ],
+      "answer": "Public Cloud"
+    },
+    {
+      "question": "Which cloud model offers the highest security/control?",
+      "options": [
+        "Public Cloud",
+        "Private Cloud",
+        "Hybrid Cloud",
+        "Shared Cloud"
+      ],
+      "answer": "Private Cloud"
+    }
+  ]
+}

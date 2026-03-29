@@ -1,0 +1,341 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Admin {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  role       String   @default("admin")
+  isActive   Boolean  @default(true)
+  totpSecret String?
+  createdAt  DateTime @default(now())
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model OtpStore {
+  id        String   @id @default(uuid())
+  email     String
+  method    String   @default("email")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  attempts  Int      @default(0)
+  otpHash   String
+
+  @@index([email])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  isVerified    Boolean        @default(false)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  role          String         @default("student")
+  avatar        String?
+  fcmTokens     FcmToken[]
+  notifications Notification[]
+  payments      Payment[]
+  subscription  Subscription?
+  progress      UserProgress[]
+  courses       UserCourse[]
+  toolSubscriptions ToolSubscription[]
+  achievements  Achievement[]
+  certificates  Certificate[]
+  reviews       Review[]
+  lastLoginAt   DateTime?
+  lastLoginIp   String?
+  lastDevice    String?
+  points        Int            @default(0)
+  level         Int            @default(1)
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model TempUser {
+  email     String   @id
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Student {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  course    String
+  status    String   @default("active")
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  title     String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  message   String
+  type      String   @default("system")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Payment {
+  id                String   @id @default(uuid())
+  userId            String
+  amount            Float
+  currency          String   @default("INR")
+  status            String   @default("PENDING")
+  method            String?  // 💳 card, upi, wallet, etc.
+  razorpayOrderId   String?
+  createdAt         DateTime @default(now())
+  razorpayPaymentId String?
+  razorpaySignature String?
+  orderId           String?
+  toolCategory      String?
+  toolName          String?
+  planType          String?
+  order             Order?   @relation(fields: [orderId], references: [id])
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Subscription {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  status        String    @default("INACTIVE")
+  plan          String    @default("DEFAULT")
+  lastPaymentId String?
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Course {
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  category      String
+  level         String         @default("Beginner")
+  lessons       Int            @default(0)
+  students      Int            @default(0)
+  price         Int            @default(0)
+  status        String         @default("Draft")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lastUpdatedBy String?
+  progress      UserProgress[]
+  users         UserCourse[]
+  certificates  Certificate[]
+  reviews       Review[]
+
+  @@index([category])
+  @@index([status])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model UserProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  lessonId  String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId, lessonId])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model FcmToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Order {
+  id            String      @id @default(uuid())
+  customerType  String
+  customer      String
+  customerEmail String?
+  fulfillment   String
+  address       String?
+  paymentMethod String
+  paymentStatus String
+  status        String
+  totalAmount   Float
+  gstAmount     Float?
+  grandTotal    Float?
+  invoiceNumber String?     @unique
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+  payments      Payment[]
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model OrderItem {
+  id       String @id @default(uuid())
+  orderId  String
+  product  String
+  quantity Int
+  price    Float
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model EmailQueue {
+  id         String   @id @default(uuid())
+  to         String
+  subject    String
+  body       String?
+  attachment String?
+  status     String   @default("PENDING")
+  attempts   Int      @default(0)
+  lastError  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model UserCourse {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  paid      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model ToolSubscription {
+  id        String    @id @default(uuid())
+  userId    String
+  category  String    // e.g. "devops", "aws"
+  tool      String    // e.g. "github", "jenkins"
+  planType  String    @default("1-month") // 1-month, 3-months, 6-months, lifetime
+  validUntil DateTime? // null for lifetime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, tool])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Achievement {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  badge       String?  // SVG or Icon name
+  unlockedAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model Certificate {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  certId    String   @unique // Public verification ID
+  issuedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([courseId])
+}
+/// ///////////////////////
+/// ///////////////////////
+model WebPage {
+  id        String   @id @default(uuid())
+  slug      String   @unique // e.g. "terms", "privacy", "faq"
+  title     String
+  content   String?  @db.Text
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+/// ///////////////////////
+/// ///////////////////////
+model BlogPost {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  content   String?  @db.Text
+  author    String   @default("Admin")
+  thumbnail String?
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      String   @default("info") // info, warning, success
+  isActive  Boolean  @default(true)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  rating    Int      @default(5)
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}

@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "title": "AWS Basics – Lesson 1: AWS, Cloud & EC2",
+    "description": "Introduction to AWS, why we use it (vs On-Premise), and a deep dive into EC2 with visual diagrams.",
+    "difficulty": "Beginner",
+    "duration": "60 min",
+    "tags": ["aws", "ec2", "cloud-computing"],
+    "updated": "2026-02-18"
+  },
+
+  "hero": {
+    "heading": "What is AWS & EC2?",
+    "subheading": "Understanding Cloud with Simple Examples",
+    "intro": "Learn why we use AWS instead of buying servers, and how EC2 works like a rented computer in the cloud."
+  },
+
+  "sections": [
+    {
+      "id": "aws-intro",
+      "title": "What is AWS?",
+      "content": [
+        "AWS (Amazon Web Services) is the world's largest cloud platform.",
+        "It allows you to rent servers, storage, and databases over the internet.",
+        "Tanglish: Veetla inverter vachirukka maari, but factory ku EB la power vangura maari. We rent powerful computers from AWS."
+      ]
+    },
+    {
+      "id": "why-aws",
+      "title": "Why use AWS? (Vs Traditional)",
+      "content": [
+        "Traditional IT: Buy servers, pay maintenance, hard to scale.",
+        "AWS Cloud: Rent servers, no maintenance, scale instantly.",
+        "Cost: Pay only for what you use (Pay-as-you-go)."
+      ]
+    },
+    {
+      "id": "ec2-intro",
+      "title": "What is EC2?",
+      "content": [
+        "EC2 stands for Elastic Compute Cloud.",
+        "It provides Virtual Servers (computers) in the cloud.",
+        "You can launch a server in minutes, install any OS (Windows/Linux), and run your apps.",
+        "Elastic means flexible: Increase or decrease servers based on traffic (e.g., Diwali Sale)."
+      ]
+    }
+  ],
+
+  "summary": [
+    "AWS is a rental shop for IT infrastructure.",
+    "EC2 is a virtual server you can rent.",
+    "Cloud computing saves money and allows instant scaling."
+  ],
+
+  "quiz": [
+    {
+      "question": "What does EC2 stand for?",
+      "options": [
+        "Elastic Compute Cloud",
+        "Easy Computer Cloud",
+        "Electric Cloud Compute",
+        "Elastic Cloud Computing"
+      ],
+      "answer": "Elastic Compute Cloud"
+    },
+    {
+      "question": "What is the main benefit of AWS vs Traditional IT?",
+      "options": ["Pay-as-you-go pricing", "Free hardware", "No internet needed", "Servers are slower"],
+      "answer": "Pay-as-you-go pricing"
+    }
+  ]
+}

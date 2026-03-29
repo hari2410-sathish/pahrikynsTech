@@ -1,0 +1,958 @@
+Folder PATH listing for volume New Volume
+Volume serial number is C042-A80A
+D:.
+³   App.css
+³   App.jsx
+³   index.css
+³   main.jsx
+³   structure.txt
+³   theme.js
+³   ThemeContext.jsx
+³   
+ÃÄÄÄapi
+³       admin.js
+³       auth.js
+³       axios.js
+³       course.js
+³       fakeAdminAPI.js
+³       otp.js
+³       resume.js
+³       
+ÃÄÄÄassets
+³   ³   react.svg
+³   ³   
+³   ÃÄÄÄcert
+³   ³       logo.png
+³   ³       seal.png
+³   ³       signature.png
+³   ³       
+³   ÃÄÄÄdocker
+³   ³       apparmor.png
+³   ³       capabilities.png
+³   ³       cicd.png
+³   ³       csi-architecture.png
+³   ³       docker-architecture.png
+³   ³       docker-buildkit.png
+³   ³       docker-container-lifecycle.png
+³   ³       docker-engine.png
+³   ³       docker-image-slim.png
+³   ³       docker-images-layers.png
+³   ³       docker-install-ubuntu.png
+³   ³       docker-install-windows.png
+³   ³       docker-load-balancing.png
+³   ³       docker-manager-worker.png
+³   ³       docker-overlay-network.png
+³   ³       docker-post-install.png
+³   ³       docker-raft.png
+³   ³       docker-security.png
+³   ³       docker-services.png
+³   ³       docker-swarm-architecture.png
+³   ³       docker-usecases.png
+³   ³       docker-vs-vm.png
+³   ³       dockerfile-best-practices.png
+³   ³       ecr-logo.png
+³   ³       fullstack.png
+³   ³       grafana.png
+³   ³       harbor-logo.png
+³   ³       harbor.png
+³   ³       kubernetes.png
+³   ³       logging.png
+³   ³       loki.png
+³   ³       microservices.png
+³   ³       namespaces.png
+³   ³       network-security.png
+³   ³       nfs-storage.png
+³   ³       notary.png
+³   ³       observability-architecture.png
+³   ³       overlay2.png
+³   ³       prom-graf.png
+³   ³       registry-architecture.png
+³   ³       seccomp.png
+³   ³       swarm-canary.png
+³   ³       swarm-monitoring.png
+³   ³       swarm-security.png
+³   ³       swarm.png
+³   ³       traefik.png
+³   ³       volumes.png
+³   ³       
+³   ÀÄÄÄgit
+³           git-add.png
+³           git-annotated-tag.png
+³           git-architecture.png
+³           git-autosquash.png
+³           git-bare.png
+³           git-branch.png
+³           git-clone.png
+³           git-commit.png
+³           git-conflict.png
+³           git-danger.png
+³           git-distributed.png
+³           git-fetch-pull.png
+³           git-file-states.png
+³           git-flow.png
+³           git-init.png
+³           git-linear.png
+³           git-merge.png
+³           git-mirror.png
+³           git-prune.png
+³           git-rebase-conflict.png
+³           git-rebase-i.png
+³           git-rebase.png
+³           git-reflog.png
+³           git-remote-errors.png
+³           git-remote.png
+³           git-reset-levels.png
+³           git-reset.png
+³           git-restore.png
+³           git-semver.png
+³           git-ssh-http.png
+³           git-stash-branch.png
+³           git-stash-conflict.png
+³           git-stash-patch.png
+³           git-stash-workflow.png
+³           git-stash.png
+³           git-status.png
+³           git-submodule.png
+³           git-switch.png
+³           git-tag.png
+³           git-undo-flow.png
+³           git-what-is.png
+³           git-why-use.png
+³           
+ÃÄÄÄcomponents
+³   ÃÄÄÄadmin
+³   ³       AddCourseModal.jsx
+³   ³       AddStudentModal.jsx
+³   ³       AdminSidebar.jsx
+³   ³       AdminTopbar.jsx
+³   ³       BarChart.jsx
+³   ³       CertificatePreview.jsx
+³   ³       CourseCard.jsx
+³   ³       CourseTable.jsx
+³   ³       CSVImportModal.jsx
+³   ³       DeviceAlertModal.jsx
+³   ³       LineChart.jsx
+³   ³       PieMini.jsx
+³   ³       StatCard.jsx
+³   ³       StudentCard.jsx
+³   ³       StudentTable.jsx
+³   ³       
+³   ÃÄÄÄcertificates
+³   ³       CertificateViewer.jsx
+³   ³       
+³   ÃÄÄÄcommon
+³   ³       Loader.jsx
+³   ³       Notification.jsx
+³   ³       
+³   ÃÄÄÄCourse
+³   ³       AutoLessonSidebar.jsx
+³   ³       AutoLessonSidebarV2.jsx
+³   ³       LessonSidebar.jsx
+³   ³       ToolHomeTemplate.jsx
+³   ³       
+³   ÃÄÄÄdashboard
+³   ³       CourseProgressList.jsx
+³   ³       LearningChart.jsx
+³   ³       LeftSidebar.jsx
+³   ³       TopBar.jsx
+³   ³       UserDetails.jsx
+³   ³       
+³   ÃÄÄÄglobal
+³   ³       Footer.jsx
+³   ³       MainNavbar.jsx
+³   ³       NotificationPanel.jsx
+³   ³       ProgressBar.jsx
+³   ³       SearchBar.jsx
+³   ³       Sidebar.jsx
+³   ³       ThemeToggle.jsx
+³   ³       
+³   ÀÄÄÄresume
+ÃÄÄÄcontexts
+³       AdminAuthContext.jsx
+³       AuthContext.jsx
+³       
+ÃÄÄÄdata
+³       navbarCourses.js
+³       
+ÃÄÄÄhooks
+³       useLessonProgress.js
+³       
+ÃÄÄÄlayouts
+³       AdminLayout.jsx
+³       UserDashboard.jsx
+³       UserLayout.jsx
+³       
+ÃÄÄÄpages
+³   ÃÄÄÄAdmin
+³   ³   ³   AddCourse.jsx
+³   ³   ³   AddLesson.jsx
+³   ³   ³   AdminDashboard.jsx
+³   ³   ³   AdminSettings.jsx
+³   ³   ³   CertificatesPro.jsx
+³   ³   ³   CourseDetails.jsx
+³   ³   ³   Dashboard.jsx
+³   ³   ³   EditCourse.jsx
+³   ³   ³   ManageCourses.jsx
+³   ³   ³   ManageStudents.jsx
+³   ³   ³   Notification.jsx
+³   ³   ³   SearchBox.jsx
+³   ³   ³   StudentDetails.jsx
+³   ³   ³   StudentPayments.jsx
+³   ³   ³   
+³   ³   ÀÄÄÄResume
+³   ³       ³   ResumeBuilder.jsx
+³   ³       ³   ResumeContext.jsx
+³   ³       ³   ResumeHome.jsx
+³   ³       ³   ResumeMaster.jsx
+³   ³       ³   ResumeMedium.jsx
+³   ³       ³   ResumePro.jsx
+³   ³       ³   ResumeSimple.jsx
+³   ³       ³   ResumeUltraPro.jsx
+³   ³       ³   
+³   ³       ÃÄÄÄcomponents
+³   ³       ³       AISummary.jsx
+³   ³       ³       DragList.jsx
+³   ³       ³       EditModal.jsx
+³   ³       ³       PhotoUpload.jsx
+³   ³       ³       ResumeForm.jsx
+³   ³       ³       ResumePreview.jsx
+³   ³       ³       SectionControls.jsx
+³   ³       ³       ThemeSwatches.jsx
+³   ³       ³       
+³   ³       ÃÄÄÄpremium
+³   ³       ³       PremiumPreviewFrame.jsx
+³   ³       ³       PremiumSidebar.jsx
+³   ³       ³       PremiumTemplateGrid.jsx
+³   ³       ³       PremiumThemePicker.jsx
+³   ³       ³       PremiumToolbar.jsx
+³   ³       ³       PremiumZoomControls.jsx
+³   ³       ³       
+³   ³       ÀÄÄÄtemplates
+³   ³               index.js
+³   ³               TemplateATS.jsx
+³   ³               TemplateMaster.jsx
+³   ³               TemplateMedium.jsx
+³   ³               TemplatePro.jsx
+³   ³               TemplateSimple.jsx
+³   ³               TemplateUltraPro.jsx
+³   ³               
+³   ÃÄÄÄAuth
+³   ³       AdminForgotPassword.jsx
+³   ³       AdminLogin.jsx
+³   ³       AdminOTPVerify.jsx
+³   ³       AdminRegister.jsx
+³   ³       AdminResetPassword.jsx
+³   ³       AdminTOTPSetup.jsx
+³   ³       Login.jsx
+³   ³       LoginForgetPassword.jsx
+³   ³       Register.jsx
+³   ³       ResetPassword.jsx
+³   ³       ResetVerify.jsx
+³   ³       userloginOTPVerify.jsx
+³   ³       
+³   ÃÄÄÄCourses
+³   ³   ³   CategoryPage.jsx
+³   ³   ³   CoursesHome.jsx
+³   ³   ³   index.js
+³   ³   ³   LessonViewer.jsx
+³   ³   ³   metaUtils.js
+³   ³   ³   ToolPage.jsx
+³   ³   ³   
+³   ³   ÃÄÄÄaws
+³   ³   ³   ³   AWSHome.jsx
+³   ³   ³   ³   AWSLesson.jsx
+³   ³   ³   ³   
+³   ³   ³   ÃÄÄÄauto-scaling
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄci-cd
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄcloud-basics
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄec2
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄiam
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄlambda
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄload-balancer
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄrds
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄroute53
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄs3
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄsns
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄsqs
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÀÄÄÄvpc
+³   ³   ³           index.jsx
+³   ³   ³           lesson1.jsx
+³   ³   ³           lesson10.jsx
+³   ³   ³           lesson11.jsx
+³   ³   ³           lesson12.jsx
+³   ³   ³           lesson13.jsx
+³   ³   ³           lesson14.jsx
+³   ³   ³           lesson15.jsx
+³   ³   ³           lesson16.jsx
+³   ³   ³           lesson17.jsx
+³   ³   ³           lesson18.jsx
+³   ³   ³           lesson19.jsx
+³   ³   ³           lesson2.jsx
+³   ³   ³           lesson20.jsx
+³   ³   ³           lesson3.jsx
+³   ³   ³           lesson4.jsx
+³   ³   ³           lesson5.jsx
+³   ³   ³           lesson6.jsx
+³   ³   ³           lesson7.jsx
+³   ³   ³           lesson8.jsx
+³   ³   ³           lesson9.jsx
+³   ³   ³           
+³   ³   ÃÄÄÄdevops
+³   ³   ³   ³   DevOpsHome.jsx
+³   ³   ³   ³   DevOpsLesson.jsx
+³   ³   ³   ³   
+³   ³   ³   ÃÄÄÄansible
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄdocker
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄgit
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄgrafana
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄjenkins
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄkubernetes
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄprometheus
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÃÄÄÄsplunk
+³   ³   ³   ³       index.jsx
+³   ³   ³   ³       lesson1.jsx
+³   ³   ³   ³       lesson10.jsx
+³   ³   ³   ³       lesson11.jsx
+³   ³   ³   ³       lesson12.jsx
+³   ³   ³   ³       lesson13.jsx
+³   ³   ³   ³       lesson14.jsx
+³   ³   ³   ³       lesson15.jsx
+³   ³   ³   ³       lesson16.jsx
+³   ³   ³   ³       lesson17.jsx
+³   ³   ³   ³       lesson18.jsx
+³   ³   ³   ³       lesson19.jsx
+³   ³   ³   ³       lesson2.jsx
+³   ³   ³   ³       lesson20.jsx
+³   ³   ³   ³       lesson3.jsx
+³   ³   ³   ³       lesson4.jsx
+³   ³   ³   ³       lesson5.jsx
+³   ³   ³   ³       lesson6.jsx
+³   ³   ³   ³       lesson7.jsx
+³   ³   ³   ³       lesson8.jsx
+³   ³   ³   ³       lesson9.jsx
+³   ³   ³   ³       
+³   ³   ³   ÀÄÄÄterraform
+³   ³   ³           index.jsx
+³   ³   ³           lesson1.jsx
+³   ³   ³           lesson10.jsx
+³   ³   ³           lesson11.jsx
+³   ³   ³           lesson12.jsx
+³   ³   ³           lesson13.jsx
+³   ³   ³           lesson14.jsx
+³   ³   ³           lesson15.jsx
+³   ³   ³           lesson16.jsx
+³   ³   ³           lesson17.jsx
+³   ³   ³           lesson18.jsx
+³   ³   ³           lesson19.jsx
+³   ³   ³           lesson2.jsx
+³   ³   ³           lesson20.jsx
+³   ³   ³           lesson3.jsx
+³   ³   ³           lesson4.jsx
+³   ³   ³           lesson5.jsx
+³   ³   ³           lesson6.jsx
+³   ³   ³           lesson7.jsx
+³   ³   ³           lesson8.jsx
+³   ³   ³           lesson9.jsx
+³   ³   ³           
+³   ³   ÀÄÄÄos
+³   ³       ³   OSHome.jsx
+³   ³       ³   OSLesson.jsx
+³   ³       ³   
+³   ³       ÃÄÄÄcentos
+³   ³       ³       index.jsx
+³   ³       ³       lesson1.jsx
+³   ³       ³       lesson10.jsx
+³   ³       ³       lesson11.jsx
+³   ³       ³       lesson12.jsx
+³   ³       ³       lesson13.jsx
+³   ³       ³       lesson14.jsx
+³   ³       ³       lesson15.jsx
+³   ³       ³       lesson16.jsx
+³   ³       ³       lesson17.jsx
+³   ³       ³       lesson18.jsx
+³   ³       ³       lesson19.jsx
+³   ³       ³       lesson2.jsx
+³   ³       ³       lesson20.jsx
+³   ³       ³       lesson3.jsx
+³   ³       ³       lesson4.jsx
+³   ³       ³       lesson5.jsx
+³   ³       ³       lesson6.jsx
+³   ³       ³       lesson7.jsx
+³   ³       ³       lesson8.jsx
+³   ³       ³       lesson9.jsx
+³   ³       ³       
+³   ³       ÃÄÄÄlinux-basics
+³   ³       ³       index.jsx
+³   ³       ³       lesson1.jsx
+³   ³       ³       lesson10.jsx
+³   ³       ³       lesson11.jsx
+³   ³       ³       lesson12.jsx
+³   ³       ³       lesson13.jsx
+³   ³       ³       lesson14.jsx
+³   ³       ³       lesson15.jsx
+³   ³       ³       lesson16.jsx
+³   ³       ³       lesson17.jsx
+³   ³       ³       lesson18.jsx
+³   ³       ³       lesson19.jsx
+³   ³       ³       lesson2.jsx
+³   ³       ³       lesson20.jsx
+³   ³       ³       lesson3.jsx
+³   ³       ³       lesson4.jsx
+³   ³       ³       lesson5.jsx
+³   ³       ³       lesson6.jsx
+³   ³       ³       lesson7.jsx
+³   ³       ³       lesson8.jsx
+³   ³       ³       lesson9.jsx
+³   ³       ³       
+³   ³       ÃÄÄÄredhat
+³   ³       ³       index.jsx
+³   ³       ³       lesson1.jsx
+³   ³       ³       lesson10.jsx
+³   ³       ³       lesson11.jsx
+³   ³       ³       lesson12.jsx
+³   ³       ³       lesson13.jsx
+³   ³       ³       lesson14.jsx
+³   ³       ³       lesson15.jsx
+³   ³       ³       lesson16.jsx
+³   ³       ³       lesson17.jsx
+³   ³       ³       lesson18.jsx
+³   ³       ³       lesson19.jsx
+³   ³       ³       lesson2.jsx
+³   ³       ³       lesson20.jsx
+³   ³       ³       lesson3.jsx
+³   ³       ³       lesson4.jsx
+³   ³       ³       lesson5.jsx
+³   ³       ³       lesson6.jsx
+³   ³       ³       lesson7.jsx
+³   ³       ³       lesson8.jsx
+³   ³       ³       lesson9.jsx
+³   ³       ³       
+³   ³       ÃÄÄÄubuntu
+³   ³       ³       index.jsx
+³   ³       ³       lesson1.jsx
+³   ³       ³       lesson10.jsx
+³   ³       ³       lesson11.jsx
+³   ³       ³       lesson12.jsx
+³   ³       ³       lesson13.jsx
+³   ³       ³       lesson14.jsx
+³   ³       ³       lesson15.jsx
+³   ³       ³       lesson16.jsx
+³   ³       ³       lesson17.jsx
+³   ³       ³       lesson18.jsx
+³   ³       ³       lesson19.jsx
+³   ³       ³       lesson2.jsx
+³   ³       ³       lesson20.jsx
+³   ³       ³       lesson3.jsx
+³   ³       ³       lesson4.jsx
+³   ³       ³       lesson5.jsx
+³   ³       ³       lesson6.jsx
+³   ³       ³       lesson7.jsx
+³   ³       ³       lesson8.jsx
+³   ³       ³       lesson9.jsx
+³   ³       ³       
+³   ³       ÃÄÄÄubuntu-shell-script
+³   ³       ³       index.jsx
+³   ³       ³       lesson1.jsx
+³   ³       ³       lesson10.jsx
+³   ³       ³       lesson11.jsx
+³   ³       ³       lesson12.jsx
+³   ³       ³       lesson13.jsx
+³   ³       ³       lesson14.jsx
+³   ³       ³       lesson15.jsx
+³   ³       ³       lesson16.jsx
+³   ³       ³       lesson17.jsx
+³   ³       ³       lesson18.jsx
+³   ³       ³       lesson19.jsx
+³   ³       ³       lesson2.jsx
+³   ³       ³       lesson20.jsx
+³   ³       ³       lesson3.jsx
+³   ³       ³       lesson4.jsx
+³   ³       ³       lesson5.jsx
+³   ³       ³       lesson6.jsx
+³   ³       ³       lesson7.jsx
+³   ³       ³       lesson8.jsx
+³   ³       ³       lesson9.jsx
+³   ³       ³       
+³   ³       ÀÄÄÄwindows-shell-script
+³   ³               index.jsx
+³   ³               lesson1.jsx
+³   ³               lesson10.jsx
+³   ³               lesson11.jsx
+³   ³               lesson12.jsx
+³   ³               lesson13.jsx
+³   ³               lesson14.jsx
+³   ³               lesson15.jsx
+³   ³               lesson16.jsx
+³   ³               lesson17.jsx
+³   ³               lesson18.jsx
+³   ³               lesson19.jsx
+³   ³               lesson2.jsx
+³   ³               lesson20.jsx
+³   ³               lesson3.jsx
+³   ³               lesson4.jsx
+³   ³               lesson5.jsx
+³   ³               lesson6.jsx
+³   ³               lesson7.jsx
+³   ³               lesson8.jsx
+³   ³               lesson9.jsx
+³   ³               
+³   ÃÄÄÄDashboard
+³   ³       UserDashboard.jsx
+³   ³       
+³   ÃÄÄÄHome
+³   ³       Home.css
+³   ³       HomePage.jsx
+³   ³       
+³   ÃÄÄÄPublic
+³   ³       ResumePublic.jsx
+³   ³       VerifyCertificate.jsx
+³   ³       
+³   ÀÄÄÄUser
+³           ChangePassword.jsx
+³           MyCourses.jsx
+³           ProgressDashboard.jsx
+³           UserProfile.jsx
+³           
+ÃÄÄÄroutes
+³       AppRoutes.jsx
+³       
+ÀÄÄÄutils
+    ³   adminAuth.js
+    ³   AdminProtectedRoute.jsx
+    ³   auth.js
+    ³   courseLoader.js
+    ³   courseModel.js
+    ³   deviceHelper.js
+    ³   deviceStore.js
+    ³   generateInvoicePDF.js
+    ³   helpers.js
+    ³   notifications.js
+    ³   ProtectedRoute.jsx
+    ³   UserProtectedRoute.jsx
+    ³   
+    ÀÄÄÄcertificates
+            bulkCertificates.js
+            darkTemplate.js
+            generateCertificatePDF.js
+            goldTemplate.js
+            minimalTemplate.js
+            modernTemplate.js
+            

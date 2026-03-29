@@ -1,0 +1,105 @@
+{
+  "en": {
+    "title": "Lesson 2 - Install Git",
+    "subtitle": "Learn how to install Git on Windows, Linux, and Mac",
+
+    "sections": [
+      {
+        "title": "Why Install Git",
+        "points": [
+          "Git must be installed before using version control",
+          "It allows developers to track code changes",
+          "Git provides command line tools for repository management",
+          "Most DevOps workflows require Git installed locally"
+        ],
+        "table": {
+          "headers": ["Tool", "Purpose"],
+          "rows": [
+            ["Git", "Version control system"],
+            ["GitHub", "Cloud repository hosting"],
+            ["Git CLI", "Command line interface for Git"]
+          ]
+        }
+      },
+
+      {
+        "title": "Install Git on Windows",
+        "points": [
+          "Go to official Git website",
+          "Download Git for Windows installer",
+          "Run installer and keep default settings",
+          "Finish installation"
+        ],
+        "commands": [
+          "https://git-scm.com/download/win"
+        ],
+        "note": "Always download Git from the official website to avoid security risks."
+      },
+
+      {
+        "title": "Install Git on Linux",
+        "points": [
+          "Most Linux distributions support Git via package manager",
+          "Ubuntu and Debian use apt",
+          "CentOS and RedHat use yum or dnf"
+        ],
+        "commands": [
+          "sudo apt update",
+          "sudo apt install git",
+          "git --version"
+        ]
+      },
+
+      {
+        "title": "Install Git on Mac",
+        "points": [
+          "Mac users can install Git using Homebrew",
+          "Alternatively install Xcode command line tools"
+        ],
+        "commands": [
+          "brew install git",
+          "git --version"
+        ]
+      },
+
+      {
+        "title": "Verify Git Installation",
+        "points": [
+          "After installation verify Git is working",
+          "Check installed version"
+        ],
+        "commands": [
+          "git --version"
+        ],
+        "note": "If Git version appears, installation was successful."
+      },
+
+      {
+        "title": "Real World Example",
+        "commands": [
+          "git --version",
+          "git help",
+          "git config --list"
+        ],
+        "note": "Every developer verifies Git installation before starting a project."
+      }
+    ]
+  },
+
+  "ta": {
+    "title": "பாடம் 2 - Git நிறுவல்",
+    "subtitle": "Windows, Linux மற்றும் Mac இல் Git நிறுவுவது",
+
+    "sections": [
+      {
+        "title": "Git ஏன் நிறுவ வேண்டும்",
+        "points": [
+          "Version control பயன்படுத்த Git தேவை",
+          "Code மாற்றங்களை track செய்ய உதவும்",
+          "DevOps workflow க்கு Git அவசியம்"
+        ],
+        "note": "Git இல்லாமல் project version control செய்ய முடியாது."
+      }
+    ]
+  }
+}
