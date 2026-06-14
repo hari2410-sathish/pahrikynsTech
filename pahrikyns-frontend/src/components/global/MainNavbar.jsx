@@ -252,7 +252,7 @@ export default function MainNavbar() {
                 }}
               >
                 <Typography sx={{ color: "#00eaff", fontWeight: 900, letterSpacing: '1px' }}>
-                  KH
+                  hari
                 </Typography>
               </Avatar>
               <Typography 
