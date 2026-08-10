@@ -19,6 +19,11 @@ const {
   verifyToolPayment
 } = require("../controllers/toolPaymentController");
 
+const {
+  createSubscriptionPayment,
+  verifySubscriptionPayment
+} = require("../controllers/subscriptionPaymentController");
+
 /* =====================================================
    USER ROUTES
 ===================================================== */
@@ -28,6 +33,12 @@ router.post("/course/create", auth, createPayment);
 
 // 🔹 Verify Razorpay payment (after success)
 router.post("/course/verify", auth, verifyPayment);
+
+// 🔹 Create SUBSCRIPTION payment + Razorpay order
+router.post("/subscription/create", auth, createSubscriptionPayment);
+
+// 🔹 Verify SUBSCRIPTION Razorpay payment
+router.post("/subscription/verify", auth, verifySubscriptionPayment);
 
 // 🔹 Create TOOL payment + Razorpay order
 router.post("/tool/create", auth, createToolPayment);

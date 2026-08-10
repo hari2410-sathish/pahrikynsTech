@@ -1,16 +1,11 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAdminAuth } from "../modules/adminmodules/context/AdminAuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Box, CircularProgress } from "@mui/material";
 
 export default function ProtectedRoute({ children }) {
-  const { admin, loading } = useAdminAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
 
-  const isAdminRoute = location.pathname.startsWith("/admin");
-
-  // =========================================
-  // ✅ 1. STILL LOADING AUTH STATE
-  // =========================================
   if (loading) {
     return (
       <Box
@@ -26,8 +21,9 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // =========================================
-  // ✅ BYPASS FOR QA TESTING
-  // =========================================
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return children;
 }

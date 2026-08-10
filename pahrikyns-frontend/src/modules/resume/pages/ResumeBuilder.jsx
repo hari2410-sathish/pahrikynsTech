@@ -7,6 +7,8 @@ import ResumePreview from "../components/preview/ResumePreview";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import ResumeRestrictionModal from "../components/common/ResumeRestrictionModal";
+import AiResumeGeneratorModal from "../components/common/AiResumeGeneratorModal";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 /** ========================================================
  * RESUME BUILDER — PRO VERSION (v1)
@@ -19,6 +21,8 @@ import ResumeRestrictionModal from "../components/common/ResumeRestrictionModal"
 export default function ResumeBuilder() {
   const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const isPro = user?.subscription?.status === "ACTIVE";
 
   const handleDownload = async () => {
     if (!user) {
@@ -55,13 +59,33 @@ export default function ResumeBuilder() {
       <div className="absolute bottom-[-100px] right-[-100px] w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
 
       <ResumeRestrictionModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <AiResumeGeneratorModal open={aiModalOpen} onClose={() => setAiModalOpen(false)} />
 
       <Box className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1600px] mx-auto h-[calc(100vh-100px)]">
         {/* LEFT: Form Controller */}
         <Box className="lg:col-span-5 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl overflow-y-auto custom-scrollbar">
-          <Typography variant="h6" className="font-bold mb-4 text-[#00eaff] flex items-center gap-2">
-            ✨ Resume Editor
-          </Typography>
+          <Box className="flex justify-between items-center mb-4">
+            <Typography variant="h6" className="font-bold text-[#00eaff] flex items-center gap-2">
+              ✨ Resume Editor
+            </Typography>
+            {isPro && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AutoAwesomeIcon />}
+                onClick={() => setAiModalOpen(true)}
+                sx={{
+                  color: "#eab308",
+                  borderColor: "rgba(234, 179, 8, 0.5)",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  "&:hover": { borderColor: "#eab308", bgcolor: "rgba(234, 179, 8, 0.1)" }
+                }}
+              >
+                Auto-Generate
+              </Button>
+            )}
+          </Box>
           <ResumeForm />
         </Box>
 

@@ -28,11 +28,9 @@ import ManageToolAccessModal from "../../components/admin/ManageToolAccessModal"
 
 // API
 import {
-  fetchStudents,
-  createStudent,
-  updateStudent,
-  deleteStudent,
-} from "../../api/users";
+  fetchUsers as fetchStudents,
+  toggleUserStatus
+} from "../Adminapi/users";
 
 export default function ManageStudents() {
   const [search, setSearch] = useState("");
@@ -117,7 +115,9 @@ export default function ManageStudents() {
 
   const handleConfirmDelete = async (id) => {
     try {
-      await deleteStudent(id);
+      // We do not have a hard delete endpoint for users.
+      // We will suspend them instead.
+      await toggleUserStatus(id);
       setOpenDelete(false);
       setDeleteTarget(null);
       await load();
@@ -129,8 +129,7 @@ export default function ManageStudents() {
   // SUSPEND / ACTIVATE Toggle
   const toggleStatus = async (s) => {
     try {
-      const newStatus = s.status === "active" ? "suspended" : "active";
-      await updateStudent(s.id, { ...s, status: newStatus });
+      await toggleUserStatus(s.id);
       await load();
     } catch (err) {
       console.error(err);

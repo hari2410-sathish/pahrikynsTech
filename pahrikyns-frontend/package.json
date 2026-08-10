@@ -18,6 +18,7 @@
     "@mui/material": "5.15.20",
     "@mui/x-charts": "6.19.5",
     "@react-oauth/google": "^0.12.2",
+    "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.4.0",
     "emoji-picker-react": "^4.16.1",
     "file-saver": "^2.0.5",
@@ -42,13 +43,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.11",
     "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.5.4",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
     "vite": "^6.4.1"
   },
   "overrides": {

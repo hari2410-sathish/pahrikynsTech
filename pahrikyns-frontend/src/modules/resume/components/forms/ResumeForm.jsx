@@ -14,7 +14,10 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useResume } from "../../context/ResumeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import API from "../../../../api/axios";
 
 /* ============================
    RESUME FORM (V2 - Complete)
@@ -27,6 +30,10 @@ import { useResume } from "../../context/ResumeContext";
 export default function ResumeForm() {
   const { state, update } = useResume();
   const { personal, experience, projects, skills } = state;
+  const { user } = useAuth();
+  
+  const [loadingField, setLoadingField] = useState(null);
+  const isPro = user?.subscription?.status === "ACTIVE";
 
   // --- STYLES ---
   const inputSx = {
@@ -99,6 +106,33 @@ export default function ResumeForm() {
     update({ projects: projects.filter((_, i) => i !== index) });
   };
 
+  // --- AI ENHANCER ---
+  const handleAiEnhance = async (type, text, index = null) => {
+    if (!text || text.trim().length < 5) return;
+    
+    // Create unique field key for loading state
+    const fieldKey = index !== null ? `${type}-${index}` : type;
+    setLoadingField(fieldKey);
+
+    try {
+      const res = await API.post("/resumes/enhance", { text, type });
+      const enhanced = res.data.enhancedText;
+      
+      if (type === "summary") {
+        updatePersonal("summary", enhanced);
+      } else if (type === "experience") {
+        updateExp(index, "description", enhanced);
+      } else if (type === "project") {
+        updateProj(index, "description", enhanced);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("AI Enhancement failed or you need a PRO subscription.");
+    } finally {
+      setLoadingField(null);
+    }
+  };
+
   return (
     <Box>
       {/* ================= PERSONAL ================= */}
@@ -146,15 +180,38 @@ export default function ResumeForm() {
           onChange={(e) => updatePersonal("location", e.target.value)}
           sx={inputSx}
         />
-        <TextField
-          label="Professional Summary"
-          size="small"
-          multiline
-          rows={3}
-          value={personal?.summary || ""}
-          onChange={(e) => updatePersonal("summary", e.target.value)}
-          sx={inputSx}
-        />
+        <Box sx={{ position: "relative" }}>
+          <TextField
+            label="Professional Summary"
+            size="small"
+            fullWidth
+            multiline
+            rows={3}
+            value={personal?.summary || ""}
+            onChange={(e) => updatePersonal("summary", e.target.value)}
+            sx={inputSx}
+          />
+          {isPro && (
+            <Button
+              size="small"
+              onClick={() => handleAiEnhance("summary", personal?.summary)}
+              disabled={loadingField === "summary" || !personal?.summary}
+              startIcon={loadingField === "summary" ? null : <AutoAwesomeIcon sx={{ fontSize: 14 }} />}
+              sx={{
+                position: "absolute",
+                bottom: -30,
+                right: 0,
+                color: "#eab308",
+                fontWeight: 700,
+                fontSize: 11,
+                textTransform: "none",
+                "&:hover": { bgcolor: "rgba(234, 179, 8, 0.1)" }
+              }}
+            >
+              {loadingField === "summary" ? "Enhancing..." : "AI Enhance"}
+            </Button>
+          )}
+        </Box>
       </Stack>
 
       {/* ================= SKILLS ================= */}
@@ -211,8 +268,30 @@ export default function ResumeForm() {
                   <TextField label="Start Date" size="small" fullWidth value={exp.start} onChange={(e) => updateExp(i, "start", e.target.value)} sx={inputSx} />
                   <TextField label="End Date" size="small" fullWidth value={exp.end} onChange={(e) => updateExp(i, "end", e.target.value)} sx={inputSx} />
                 </Stack>
-                <TextField label="Description" size="small" multiline rows={3} value={exp.description} onChange={(e) => updateExp(i, "description", e.target.value)} sx={inputSx} />
-                <Button color="error" size="small" startIcon={<DeleteIcon />} onClick={() => removeExp(i)}>Remove</Button>
+                <Box sx={{ position: "relative" }}>
+                  <TextField label="Description" fullWidth size="small" multiline rows={3} value={exp.description} onChange={(e) => updateExp(i, "description", e.target.value)} sx={inputSx} />
+                  {isPro && (
+                    <Button
+                      size="small"
+                      onClick={() => handleAiEnhance("experience", exp.description, i)}
+                      disabled={loadingField === `experience-${i}` || !exp.description}
+                      startIcon={loadingField === `experience-${i}` ? null : <AutoAwesomeIcon sx={{ fontSize: 14 }} />}
+                      sx={{
+                        position: "absolute",
+                        bottom: -30,
+                        right: 0,
+                        color: "#eab308",
+                        fontWeight: 700,
+                        fontSize: 11,
+                        textTransform: "none",
+                        "&:hover": { bgcolor: "rgba(234, 179, 8, 0.1)" }
+                      }}
+                    >
+                      {loadingField === `experience-${i}` ? "Enhancing..." : "AI Enhance"}
+                    </Button>
+                  )}
+                </Box>
+                <Button color="error" size="small" startIcon={<DeleteIcon />} sx={{ mt: 2 }} onClick={() => removeExp(i)}>Remove</Button>
               </Stack>
             </AccordionDetails>
           </Accordion>
@@ -243,8 +322,30 @@ export default function ResumeForm() {
                 <TextField label="Project Title" size="small" value={proj.title} onChange={(e) => updateProj(i, "title", e.target.value)} sx={inputSx} />
                 <TextField label="Technologies Used" size="small" value={proj.tech} onChange={(e) => updateProj(i, "tech", e.target.value)} sx={inputSx} />
                 <TextField label="Link / GitHub" size="small" value={proj.link} onChange={(e) => updateProj(i, "link", e.target.value)} sx={inputSx} />
-                <TextField label="Description" size="small" multiline rows={2} value={proj.description} onChange={(e) => updateProj(i, "description", e.target.value)} sx={inputSx} />
-                <Button color="error" size="small" startIcon={<DeleteIcon />} onClick={() => removeProj(i)}>Remove</Button>
+                <Box sx={{ position: "relative" }}>
+                  <TextField label="Description" fullWidth size="small" multiline rows={2} value={proj.description} onChange={(e) => updateProj(i, "description", e.target.value)} sx={inputSx} />
+                  {isPro && (
+                    <Button
+                      size="small"
+                      onClick={() => handleAiEnhance("project", proj.description, i)}
+                      disabled={loadingField === `project-${i}` || !proj.description}
+                      startIcon={loadingField === `project-${i}` ? null : <AutoAwesomeIcon sx={{ fontSize: 14 }} />}
+                      sx={{
+                        position: "absolute",
+                        bottom: -30,
+                        right: 0,
+                        color: "#eab308",
+                        fontWeight: 700,
+                        fontSize: 11,
+                        textTransform: "none",
+                        "&:hover": { bgcolor: "rgba(234, 179, 8, 0.1)" }
+                      }}
+                    >
+                      {loadingField === `project-${i}` ? "Enhancing..." : "AI Enhance"}
+                    </Button>
+                  )}
+                </Box>
+                <Button color="error" size="small" startIcon={<DeleteIcon />} sx={{ mt: 2 }} onClick={() => removeProj(i)}>Remove</Button>
               </Stack>
             </AccordionDetails>
           </Accordion>

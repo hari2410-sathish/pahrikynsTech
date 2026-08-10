@@ -69,6 +69,24 @@ router.put(
   resumeController.adminForceUpdateResume
 );
 
+const resumeAiController = require("../controllers/resumeAiController");
+
+// AI Enhance Route (PRO SUBSCRIPTION REQUIRED)
+// /api/resumes/enhance
+router.post(
+  "/enhance",
+  authMiddleware,
+  resumeAiController.enhanceResumeText
+);
+
+// AI Full Generate Route (PRO SUBSCRIPTION REQUIRED)
+// /api/resumes/generate-full
+router.post(
+  "/generate-full",
+  authMiddleware,
+  resumeAiController.generateFullResume
+);
+
 module.exports = router;
 // Score resume (user or admin)
 router.get(

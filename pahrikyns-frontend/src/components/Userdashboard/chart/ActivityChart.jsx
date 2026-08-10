@@ -11,8 +11,16 @@ import { LineChart } from "@mui/x-charts/LineChart";
  * - Never overflow container
  */
 
-export default function ActivityChart({ data }) {
-  const chartData = data && data.length === 7 ? data : [0, 0, 0, 0, 0, 0, 0];
+export default function ActivityChart({ activityData = [0, 0, 0, 0, 0, 0, 0] }) {
+  const data = [
+    { name: "Mon", tasks: activityData[0] || 0, score: (activityData[0] || 0) * 10 },
+    { name: "Tue", tasks: activityData[1] || 0, score: (activityData[1] || 0) * 10 },
+    { name: "Wed", tasks: activityData[2] || 0, score: (activityData[2] || 0) * 10 },
+    { name: "Thu", tasks: activityData[3] || 0, score: (activityData[3] || 0) * 10 },
+    { name: "Fri", tasks: activityData[4] || 0, score: (activityData[4] || 0) * 10 },
+    { name: "Sat", tasks: activityData[5] || 0, score: (activityData[5] || 0) * 10 },
+    { name: "Sun", tasks: activityData[6] || 0, score: (activityData[6] || 0) * 10 },
+  ];
   
   return (
     <motion.div
@@ -30,13 +38,13 @@ export default function ActivityChart({ data }) {
         <LineChart
           xAxis={[
             {
-              data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+              data: data.map((d) => d.name),
               scaleType: "point",
             },
           ]}
           series={[
             {
-              data: chartData,
+              data: data.map((d) => d.tasks),
               color: "#7dd3fc",     // ✅ softer cyan
               area: true,
             },

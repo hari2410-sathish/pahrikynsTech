@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Box, Grid, Typography, Paper, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Grid, Typography, Paper, Button, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import API from "../../api/axios";
 
 /* --------- CORE COMPONENTS --------- */
 import LeftSidebar from "../../components/Userdashboard/LeftSidebar";
@@ -37,6 +38,23 @@ export default function ProgressDashboard() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  const [stats, setStats] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      API.get("/users/dashboard-stats"),
+      API.get("/users/my-courses")
+    ])
+      .then(([statsRes, coursesRes]) => {
+        setStats(statsRes.data);
+        setCourses(coursesRes.data);
+      })
+      .catch((err) => console.error("Failed to load dashboard data", err))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <Box
       sx={{
@@ -52,31 +70,37 @@ export default function ProgressDashboard() {
       <Box sx={{ flexGrow: 1, p: 3 }}>
         <TopBar />
 
-        {/* ---------- WELCOME BANNER ---------- */}
-        <WelcomeBanner
-          name={user?.name || "User"}
-          level={6}
-          streak={14}
-        />
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+            <CircularProgress sx={{ color: "#00eaff" }} />
+          </Box>
+        ) : (
+          <>
+            {/* ---------- WELCOME BANNER ---------- */}
+            <WelcomeBanner
+              name={user?.name || "User"}
+              level={stats?.level || 1}
+              streak={stats?.streak || 0}
+            />
 
-        {/* ---------- QUICK STATS (A+B+C style) ---------- */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-            gap: 3,
-            mt: 4,
-            mb: 4,
-          }}
-        >
-          <StatCard label="Courses Enrolled" value="12" color="#00eaff" />
-          <StatCard label="Completed" value="5" color="#7b3fe4" />
-          <StatCard label="Learning Hours" value="42 hrs" color="#06f9a5" />
-          <StatCard label="Progress" value="68%" color="#ff7de9" />
-        </Box>
+            {/* ---------- QUICK STATS ---------- */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+                gap: 3,
+                mt: 4,
+                mb: 4,
+              }}
+            >
+              <StatCard label="Courses Enrolled" value={stats?.enrolledCourses || 0} color="#00eaff" />
+              <StatCard label="Completed Lessons" value={stats?.completedLessons || 0} color="#7b3fe4" />
+              <StatCard label="Learning Hours" value={`${stats?.learningHours || 0} hrs`} color="#06f9a5" />
+              <StatCard label="Progress" value={`${stats?.overallProgress || 0}%`} color="#ff7de9" />
+            </Box>
 
-        {/* ---------- STREAK PANEL ---------- */}
-        <StreakWidget streak={14} xp={320} />
+            {/* ---------- STREAK PANEL ---------- */}
+            <StreakWidget streak={stats?.streak || 0} xp={stats?.points || 0} />
 
         {/* ---------- AI RECOMMENDATION ---------- */}
         <Box sx={{ mt: 4 }}>
@@ -87,26 +111,17 @@ export default function ProgressDashboard() {
         <SectionTitle title="Continue Learning" />
 
         <HorizontalScroll>
-          <CourseCard
-            title="React Crash Course"
-            progress={65}
-            image="https://picsum.photos/400/200?random=1"
-          />
-          <CourseCard
-            title="JavaScript Mastery"
-            progress={40}
-            image="https://picsum.photos/400/200?random=2"
-          />
-          <CourseCard
-            title="Python Zero to Hero"
-            progress={85}
-            image="https://picsum.photos/400/200?random=3"
-          />
-          <CourseCard
-            title="UI/UX Design Basics"
-            progress={20}
-            image="https://picsum.photos/400/200?random=4"
-          />
+          {courses.slice(0, 4).map((c, i) => (
+            <CourseCard
+              key={i}
+              title={c.course?.title}
+              progress={c.progress}
+              image={`https://picsum.photos/400/200?random=${i}`}
+            />
+          ))}
+          {courses.length === 0 && (
+             <Typography sx={{ color: "rgba(255,255,255,0.5)", py: 2, px: 2 }}>No courses yet. Start learning!</Typography>
+          )}
         </HorizontalScroll>
 
         {/* ---------- CATEGORY FILTER ---------- */}
@@ -118,77 +133,66 @@ export default function ProgressDashboard() {
         <SectionTitle title="My Courses" />
 
         <GridLayout>
-          <CourseGridCard
-            title="Front-End Development Mastery"
-            category="Web Dev"
-            progress={72}
-            image="https://picsum.photos/600/400?random=10"
-          />
-          <CourseGridCard
-            title="Mastering Python"
-            category="Programming"
-            progress={45}
-            image="https://picsum.photos/600/400?random=11"
-          />
-          <CourseGridCard
-            title="UI/UX Complete Guide"
-            category="Design"
-            progress={20}
-            image="https://picsum.photos/600/400?random=12"
-          />
-          <CourseGridCard
-            title="React + Firebase Pro"
-            category="Fullstack"
-            progress={90}
-            image="https://picsum.photos/600/400?random=13"
-          />
+          {courses.length > 0 ? (
+            courses.map((c, i) => (
+              <CourseGridCard
+                key={i}
+                title={c.course?.title}
+                category={c.course?.category}
+                progress={c.progress}
+                image={`https://picsum.photos/600/400?random=${i + 10}`}
+              />
+            ))
+          ) : (
+             <Typography sx={{ color: "rgba(255,255,255,0.5)", py: 2 }}>You haven't enrolled in any courses yet.</Typography>
+          )}
         </GridLayout>
 
         {/* ---------- ACTIVITY ---------- */}
         <SectionTitle title="Weekly Activity" />
         <GlassPanel>
-          <ActivityChart />
+          <ActivityChart activityData={stats?.weeklyActivity} />
         </GlassPanel>
 
         {/* ---------- LEARNING CHART ---------- */}
         <SectionTitle title="Learning Progress" />
         <GlassPanel>
-          <LearningChart />
+          <LearningChart activityData={stats?.weeklyActivity} />
         </GlassPanel>
 
         {/* ---------- PROGRESS LIST ---------- */}
         <SectionTitle title="Your Course Progress" />
         <GlassPanel>
-          <CourseProgressList />
+          <CourseProgressList courses={courses} />
         </GlassPanel>
 
         {/* ---------- ACHIEVEMENTS ---------- */}
         <SectionTitle title="Achievements" />
         <FlexWrap>
-          <AchievementCard title="Course Champion" level={3} />
-          <AchievementCard title="Star Learner" level={5} />
-          <AchievementCard title="Premium Badge" level={1} />
-          <AchievementCard title="Active Streak" level={7} />
+          {stats?.achievements?.length > 0 ? (
+            stats.achievements.map((ach) => (
+               <AchievementCard key={ach.id} title={ach.title} level={1} />
+            ))
+          ) : (
+            <Typography sx={{ color: "rgba(255,255,255,0.5)" }}>Keep learning to earn achievements!</Typography>
+          )}
         </FlexWrap>
 
         {/* ---------- CERTIFICATES ---------- */}
         <SectionTitleGradient title="Certificates" />
         <FlexWrap>
-          <CertificateCard
-            title="React Development Masterclass"
-            issuedBy="Pahrikyns Academy"
-            date="Oct 12, 2025"
-          />
-          <CertificateCard
-            title="Python Zero to Hero"
-            issuedBy="Pahrikyns Academy"
-            date="Sep 28, 2025"
-          />
-          <CertificateCard
-            title="UI/UX Design Essentials"
-            issuedBy="Pahrikyns Studio"
-            date="Aug 15, 2025"
-          />
+          {stats?.certificates?.length > 0 ? (
+            stats.certificates.map((cert) => (
+              <CertificateCard
+                key={cert.id}
+                title={cert.course?.title || "Course Completed"}
+                issuedBy="Pahrikyns Academy"
+                date={new Date(cert.issuedAt).toLocaleDateString()}
+              />
+            ))
+          ) : (
+            <Typography sx={{ color: "rgba(255,255,255,0.5)" }}>Complete courses to earn certificates!</Typography>
+          )}
         </FlexWrap>
 
         {/* ---------- LEARNING PATH ---------- */}
@@ -211,6 +215,8 @@ export default function ProgressDashboard() {
         <Box sx={{ mt: 5 }}>
           <QuickLinks navigate={navigate} />
         </Box>
+        </>
+        )}
       </Box>
     </Box>
   );

@@ -1,4 +1,48 @@
 export const devopsData = {
+  "linux-for-devops": {
+    num: 0,
+    title: { en: "Linux For DevOps", ta: "லினக்ஸ் (Linux)" },
+    description: { en: "Essential Linux commands and administration for DevOps.", ta: "தேவொப்ஸ்-க்கு தேவையான லினக்ஸ் அடிப்படைகள்." },
+    longDescription: {
+      en: "Linux is the foundation of DevOps. Understanding how to navigate the file system, manage processes, and write shell scripts is essential for automating infrastructure.",
+      ta: "லினக்ஸ் (Linux) என்பது தேவொப்ஸ்-இன் அடித்தளம். சர்வர்களை நிர்வகிக்க லினக்ஸ் கட்டளைகள் (Commands) மிகவும் அவசியம்."
+    },
+    videoUrl: "https://www.youtube.com/embed/v_1aLZB4BgI",
+    codeExample: { language: "bash", title: "Basic Commands", content: "ls -la\nchmod +x script.sh\ntop\ngrep -r 'error' /var/log" }
+  },
+  "jenkins": {
+    num: 0,
+    title: { en: "Jenkins (Core)", ta: "ஜென்கின்ஸ் (Jenkins) Core" },
+    description: { en: "The leading open-source automation server.", ta: "முன்னணி ஓப்பன் சோர்ஸ் ஆட்டோமேஷன் சர்வர்." },
+    longDescription: {
+      en: "Jenkins provides hundreds of plugins to support building, deploying and automating any project. This module covers core concepts before moving to pipelines.",
+      ta: "ஜென்கின்ஸ் (Jenkins) மூலம் எந்தவொரு புராஜெக்டையும் தானியங்கி (Automate) செய்ய முடியும்."
+    },
+    videoUrl: "https://www.youtube.com/embed/FX322RVNGj4",
+    codeExample: { language: "bash", title: "Jenkins Run", content: "java -jar jenkins.war --httpPort=8080" }
+  },
+  "git": {
+    num: 0,
+    title: { en: "Git Version Control", ta: "கிட் (Git)" },
+    description: { en: "Version control system for tracking changes in source code.", ta: "கோட்களில் செய்யும் மாற்றங்களைக் கண்காணிக்க உதவும் கருவி." },
+    longDescription: {
+      en: "Git is a distributed version-control system for tracking changes in any set of files, originally designed for coordinating work among programmers cooperating on source code during software development.",
+      ta: "கிட் (Git) என்பது நாம் எழுதும் கோட்களைப் பாதுகாப்பாக சேமித்து வைக்கவும், மற்றவர்களுடன் இணைந்து வேலை செய்யவும் உதவும் மிக முக்கியமான கருவி."
+    },
+    videoUrl: "https://www.youtube.com/embed/8JJ101D3knE",
+    codeExample: { language: "bash", title: "Git Commands", content: "git init\ngit add .\ngit commit -m 'Initial commit'\ngit push origin main" }
+  },
+  "docker": {
+    num: 0,
+    title: { en: "Docker Containerization", ta: "டாக்கர் (Docker)" },
+    description: { en: "Package applications into containers.", ta: "அப்ளிகேஷன்களை கன்டெய்னர்களாக மாற்றுதல்." },
+    longDescription: {
+      en: "Docker is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers.",
+      ta: "டாக்கர் (Docker) மூலம் அப்ளிகேஷன்களைத் தனியாக ஒரு கன்டெய்னரில் போட்டு ரன் செய்யலாம். இது எந்தக் கணினியிலும் பிரச்சனை இல்லாமல் வேலை செய்ய உதவும்."
+    },
+    videoUrl: "https://www.youtube.com/embed/gAkwW2tuIqE",
+    codeExample: { language: "dockerfile", title: "Dockerfile Example", content: "FROM node:14\nWORKDIR /app\nCOPY . .\nRUN npm install\nCMD [\"node\", \"index.js\"]" }
+  },
   "devops-intro": {
     num: 1,
     title: { en: "DevOps Introduction & Culture", ta: "தேவொப்ஸ் (DevOps) அறிமுகம்" },

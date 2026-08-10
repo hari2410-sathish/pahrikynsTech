@@ -31,7 +31,12 @@ export default function CategoryPage() {
       sx={{
         p: { xs: 2, md: 4 },
         minHeight: "90vh",
-        background: "linear-gradient(135deg, #021018 0%, #041225 100%)",
+        background: data.bgImage 
+          ? `linear-gradient(135deg, rgba(2,16,24,0.75) 0%, rgba(4,18,37,0.85) 100%), url(${data.bgImage})`
+          : "linear-gradient(135deg, #021018 0%, #041225 100%)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
         color: "white",
       }}
     >
@@ -156,7 +161,7 @@ export default function CategoryPage() {
                   "& svg": { fontSize: 35 },
                 }}
               >
-                {item.icon}
+                {item.logo ? <img src={item.logo} alt={item.name} width="40" height="40" /> : item.icon}
               </Box>
 
               <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700, mb: 1 }}>

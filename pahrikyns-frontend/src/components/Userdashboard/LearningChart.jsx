@@ -19,17 +19,17 @@ import { Box } from "@mui/material";
  * - Calm, readable, non-distracting
  */
 
-const data = [
-  { day: "Mon", mins: 40 },
-  { day: "Tue", mins: 55 },
-  { day: "Wed", mins: 20 },
-  { day: "Thu", mins: 75 },
-  { day: "Fri", mins: 30 },
-  { day: "Sat", mins: 90 },
-  { day: "Sun", mins: 60 },
-];
+export default function LearningChart({ activityData = [0,0,0,0,0,0,0] }) {
+  const data = [
+    { day: "Mon", mins: (activityData[0] || 0) * 30 },
+    { day: "Tue", mins: (activityData[1] || 0) * 30 },
+    { day: "Wed", mins: (activityData[2] || 0) * 30 },
+    { day: "Thu", mins: (activityData[3] || 0) * 30 },
+    { day: "Fri", mins: (activityData[4] || 0) * 30 },
+    { day: "Sat", mins: (activityData[5] || 0) * 30 },
+    { day: "Sun", mins: (activityData[6] || 0) * 30 },
+  ];
 
-export default function LearningChart() {
   return (
     <Box sx={{ height: 290, width: "100%", mt: 1 }}>
       <ResponsiveContainer width="100%" height="100%">

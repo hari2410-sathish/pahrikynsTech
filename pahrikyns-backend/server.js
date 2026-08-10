@@ -15,9 +15,12 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const http = require("http");
-const jwt = require("jsonwebtoken");
-const { Server } = require("socket.io");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const morgan = require("morgan");
+const logger = require("./src/utils/logger");
+const { globalErrorHandler } = require("./src/utils/errorHandler");
+const { initSocket } = require("./socket");
 
 // ============================
 // ROUTES
@@ -104,9 +107,26 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
 // ============================
-// SECURITY
+// SECURITY & RATE LIMITING
 // ============================
 app.use(helmet());
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window`
+  message: "Too many requests from this IP, please try again after 15 minutes",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.use("/api/", apiLimiter);
+app.use("/auth/", apiLimiter);
+
+// ============================
+// LOGGING
+// ============================
+app.use(morgan("combined", {
+  stream: { write: (message) => logger.info(message.trim()) }
+}));
 
 // ============================
 // BODY PARSERS
@@ -166,13 +186,15 @@ app.use("/api/achievements", require("./src/routes/achievementRoutes"));
 // ============================
 // GLOBAL ERROR HANDLER
 // ============================
-app.use((err, req, res, next) => {
-  console.error("❌ GLOBAL ERROR:", err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Server error",
-  });
+// Handle unknown routes
+app.all("*", (req, res, next) => {
+  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  err.statusCode = 404;
+  next(err);
 });
+
+// Centralized Error Handling Middleware
+app.use(globalErrorHandler);
 
 // ============================
 // HTTP SERVER
@@ -180,80 +202,16 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 // ============================
-// SOCKET.IO
+// SOCKET.IO INITIALIZATION
 // ============================
-const io = new Server(server, {
-  cors: {
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (isAllowedOrigin(origin)) return callback(null, true);
-      return callback(new Error(`Socket CORS blocked for origin: ${origin}`));
-    },
-    credentials: true,
-  },
-});
-
-app.set("io", io);
-
-// ============================
-// SOCKET AUTH
-// ============================
-io.use((socket, next) => {
-  try {
-    const token =
-      socket.handshake.auth?.token ||
-      socket.handshake.query?.token ||
-      socket.handshake.headers?.authorization?.split(" ")[1];
-    if (!token) return next(new Error("Auth token missing"));
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = decoded;
-    next();
-  } catch (err) {
-    console.error("❌ Socket Auth Error:", err.message);
-    next(new Error("Invalid token"));
-  }
-});
-
-// ============================
-// SOCKET EVENTS
-// ============================
-io.on("connection", (socket) => {
-  const userId = socket.user?.id;
-
-  console.log(`🔌 Socket Connected: ${socket.id} | User: ${userId}`);
-
-  if (userId) socket.join(`user:${userId}`);
-
-  socket.on("join_room", (room) => socket.join(room));
-  socket.on("leave_room", (room) => socket.leave(room));
-
-  socket.on("chat_message", ({ room, content, type = "text" }) => {
-    io.to(room).emit("receive_message", {
-      id: Date.now().toString(),
-      senderId: userId,
-      senderName: socket.user?.name || "User",
-      content,
-      type,
-      timestamp: new Date(),
-    });
-  });
-
-  socket.on("typing", ({ room, isTyping }) => {
-    socket.to(room).emit("user_typing", { userId, isTyping });
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`❌ Socket Disconnected: ${socket.id}`);
-  });
-});
+initSocket(server);
 
 // ============================
 // START SERVER
 // ============================
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+  logger.info(`🚀 Server running at http://0.0.0.0:${PORT}`);
 });
 
 // ============================
@@ -264,3 +222,9 @@ const startInvoiceCleanupJob = require("./src/jobs/invoiceCleanupJob");
 
 startEmailRetryJob();
 startInvoiceCleanupJob();
+
+// triggered restart
+
+// triggered restart 2
+
+// triggered restart 3

@@ -5,42 +5,33 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import CloudIcon from "@mui/icons-material/Cloud";
 import ComputerIcon from "@mui/icons-material/Computer";
 import StorageIcon from "@mui/icons-material/Storage";
-import { fetchAdminCategories } from "../../modules/adminmodules/Adminapi/coursesAdmin";
+import { COURSE_DATA } from "../../data/courseData";
 
 export default function CoursesHome() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadCategories();
-  }, []);
+    const mapped = Object.values(COURSE_DATA).map(c => {
+      // Choose an icon based on title if you want, or just use a generic one.
+      // COURSE_DATA doesn't have a top-level icon, but we can reuse the logic
+      let icon = <ComputerIcon sx={{ fontSize: 40, color: "#1ed86c" }} />;
+      const titleLower = c.title.toLowerCase();
+      if (titleLower.includes("devops")) icon = <GitHubIcon sx={{ fontSize: 40, color: "#00eaff" }} />;
+      else if (titleLower.includes("aws") || titleLower.includes("azure") || titleLower.includes("gcp") || titleLower.includes("cloud")) icon = <CloudIcon sx={{ fontSize: 40, color: "#ff9900" }} />;
+      else if (titleLower.includes("database") || titleLower.includes("sql")) icon = <StorageIcon sx={{ fontSize: 40, color: "#3b82f6" }} />;
+      else if (titleLower.includes("system")) icon = <ComputerIcon sx={{ fontSize: 40, color: "#00eaff" }} />;
 
-  async function loadCategories() {
-    try {
-      const data = await fetchAdminCategories();
-      // Map backend categories to include icons and descriptions
-      const mapped = data.map(c => ({
-        name: c.category,
-        path: `/courses/${c.category.toLowerCase()}`,
-        desc: `Master ${c.category} with our production-grade training.`,
-        count: c._count.id,
-        icon: c.category.toLowerCase().includes("devops") ? <GitHubIcon sx={{ fontSize: 40, color: "#00eaff" }} /> :
-              c.category.toLowerCase().includes("aws") || 
-              c.category.toLowerCase().includes("azure") || 
-              c.category.toLowerCase().includes("gcp") || 
-              c.category.toLowerCase().includes("cloud") ? <CloudIcon sx={{ fontSize: 40, color: "#ff9900" }} /> :
-              c.category.toLowerCase().includes("database") || 
-              c.category.toLowerCase().includes("sql") ? <StorageIcon sx={{ fontSize: 40, color: "#3b82f6" }} /> :
-              c.category.toLowerCase().includes("system") ? <ComputerIcon sx={{ fontSize: 40, color: "#00eaff" }} /> :
-              <ComputerIcon sx={{ fontSize: 40, color: "#1ed86c" }} />
-      }));
-      setCategories(mapped);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }
+      return {
+        name: c.title,
+        path: c.link,
+        desc: c.desc,
+        icon: icon
+      };
+    });
+    setCategories(mapped);
+    setLoading(false);
+  }, []);
 
   if (loading) return <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}><CircularProgress /></Box>;
 

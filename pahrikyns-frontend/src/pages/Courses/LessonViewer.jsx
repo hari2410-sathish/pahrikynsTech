@@ -43,7 +43,7 @@ export default function LessonViewer() {
     if (!user) {
       navigate("/login?redirect=" + encodeURIComponent(`/courses/${category}/${tool}/${lessonId}`));
     } else {
-      API.get(`/courses/tool/${category}/${tool}/access`)
+      API.get(`/courses/tool/${category}/${tool}/access?lessonId=${lessonId}`)
         .then((res) => {
           if (res.data.access) {
             setHasAccess(true);

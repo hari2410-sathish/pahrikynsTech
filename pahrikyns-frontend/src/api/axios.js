@@ -41,4 +41,39 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// 🌐 Global Response Interceptor
+API.interceptors.response.use(
+  (response) => {
+    // If the backend wrapped data in { success, data, message }, we might still return response
+    // to avoid breaking existing code, but existing code expects response.data
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Unauthorized: Auto-logout user
+        localStorage.removeItem("USER_TOKEN");
+        localStorage.removeItem("ADMIN_TOKEN");
+        
+        // Optionally redirect to login page if we're not already there
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith("/admin")) {
+          if (currentPath !== "/admin/login") {
+            window.location.href = "/admin/login";
+          }
+        } else {
+          if (currentPath !== "/login") {
+            window.location.href = "/login";
+          }
+        }
+      }
+      
+      // Standardize the error object returned to the components
+      const errorMessage = error.response.data?.message || "An unexpected error occurred.";
+      error.message = errorMessage;
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default API;

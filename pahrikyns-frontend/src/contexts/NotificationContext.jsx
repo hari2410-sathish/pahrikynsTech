@@ -16,6 +16,9 @@ export const NotificationProvider = ({ children }) => {
 
   // Load notifications from API
   const loadNotifications = useCallback(async () => {
+    const token = localStorage.getItem("USER_TOKEN");
+    if (!token) return; // Do not fetch if not logged in
+
     setLoading(true);
     try {
       const data = await fetchNotifications(1, 50); // Fetch last 50

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, Paper, Grid, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { createPayment, verifyPayment } from "../../api/payment";
+import { createSubscriptionPayment, verifySubscriptionPayment } from "../../api/payment";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -50,26 +50,26 @@ export default function PricingPage() {
         setLoading(true);
         try {
             // 1. Create Order
-            const res = await createPayment(plan.price, "subscription-" + plan.id);
+            const res = await createSubscriptionPayment(plan.id, plan.price);
             if (!res.ok) {
                 alert("Failed to create order: " + res.error);
                 setLoading(false);
                 return;
             }
 
-            const { order } = res.data;
+            const { data } = res;
 
             // 2. Open Razorpay
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Ensure this env var exists
-                amount: order.amount,
-                currency: order.currency,
+                amount: data.amount,
+                currency: data.currency,
                 name: "Pahrikyns",
                 description: `Subscription - ${plan.title}`,
-                order_id: order.id,
+                order_id: data.orderId,
                 handler: async function (response) {
                     // 3. Verify Payment
-                    const verifyRes = await verifyPayment(response);
+                    const verifyRes = await verifySubscriptionPayment(response);
                     if (verifyRes.ok) {
                         alert("Subscription Successful! Welcome to Pro.");
                         navigate("/dashboard");

@@ -24,7 +24,7 @@ export default function ResumePreview({ readOnly = false }) {
   }
 
   return (
-    <Box className="w-full">
+    <Box id="resume-preview" className="w-full">
       <TemplateComponent readOnly={readOnly} config={template.config} />
     </Box>
   );

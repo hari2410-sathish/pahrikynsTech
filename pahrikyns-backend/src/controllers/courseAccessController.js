@@ -58,10 +58,19 @@ exports.checkToolAccess = async (req, res) => {
   try {
     const userId = req.user.id;
     const { category, tool } = req.params;
+    const { lessonId } = req.query;
 
     // Admin has full access
     if (req.user.role === "admin") {
       return res.json({ access: true, reason: "ADMIN" });
+    }
+
+    // Check GLOBAL Pro Subscription
+    const proSub = await prisma.subscription.findUnique({
+      where: { userId },
+    });
+    if (proSub?.status === "ACTIVE") {
+      return res.json({ access: true, reason: "PRO_SUBSCRIPTION" });
     }
 
     // Check active tool subscription
@@ -74,9 +83,17 @@ exports.checkToolAccess = async (req, res) => {
     if (sub) {
       if (sub.validUntil === null || new Date(sub.validUntil) > new Date()) {
         return res.json({ access: true, reason: "TOOL_SUBSCRIPTION" });
-      } else {
-        const { getBasePrice } = require("../config/pricing");
-        return res.json({ access: false, message: "Subscription expired", basePrice: getBasePrice(category, tool) });
+      }
+    }
+
+    // NEW USER TRIAL: First 5 days, access to lesson1 and lesson2
+    if (lessonId === "lesson1" || lessonId === "lesson2") {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (user) {
+        const daysSinceRegistration = (new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24);
+        if (daysSinceRegistration <= 5) {
+          return res.json({ access: true, reason: "NEW_USER_TRIAL" });
+        }
       }
     }
 

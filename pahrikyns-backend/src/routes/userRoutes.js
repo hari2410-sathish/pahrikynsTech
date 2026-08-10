@@ -37,24 +37,71 @@ const auth = require("../middlewares/authMiddleware");
 /* =========================
    PUBLIC ROUTES
 ========================= */
+const { handleValidationErrors, validationRules, validators } = require("../middlewares/validateRequest");
 
 // ✅ REGISTER → SEND OTP
-router.post("/register", registerUser);
+router.post(
+  "/register",
+  [
+    validators.body("name").notEmpty().withMessage("Name is required"),
+    validationRules.email(),
+    validationRules.password(6),
+    handleValidationErrors,
+  ],
+  registerUser
+);
 
 // ✅ LOGIN
-router.post("/login", loginUser);
+router.post(
+  "/login",
+  [
+    validationRules.email(),
+    validators.body("password").notEmpty().withMessage("Password is required"),
+    handleValidationErrors,
+  ],
+  loginUser
+);
 
 // ✅ SEND OTP
-router.post("/send-otp", sendUserOTP);
+router.post(
+  "/send-otp",
+  [
+    validationRules.email(),
+    handleValidationErrors
+  ],
+  sendUserOTP
+);
 
 // ✅ VERIFY OTP
-router.post("/verify-otp", verifyOTP);
+router.post(
+  "/verify-otp",
+  [
+    validationRules.email(),
+    validators.body("otp").notEmpty().withMessage("OTP is required"),
+    handleValidationErrors
+  ],
+  verifyOTP
+);
 
 // ✅ RESEND OTP
-router.post("/resend-otp", resendUserOTP);
+router.post(
+  "/resend-otp",
+  [
+    validationRules.email(),
+    handleValidationErrors
+  ],
+  resendUserOTP
+);
 
 // ✅ GOOGLE LOGIN
-router.post("/google-login", googleLogin);
+router.post(
+  "/google-login",
+  [
+    validators.body("token").notEmpty().withMessage("Google token missing"),
+    handleValidationErrors
+  ],
+  googleLogin
+);
 
 /* =========================
    PROTECTED ROUTES (JWT)

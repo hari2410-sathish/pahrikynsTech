@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import AWSHome from "../pages/Courses/aws/AWSHome";
 import AWSLesson from "../pages/Courses/aws/AWSLesson";
@@ -11,6 +11,7 @@ import OSLesson from "../pages/Courses/os/OSLesson";
 export default function CourseRoutes() {
   return (
     <Routes>
+      <Route index element={<Navigate to="devops" replace />} />
       <Route path="aws" element={<AWSHome />} />
       <Route path="aws/:tool" element={<AWSLesson />} />
       

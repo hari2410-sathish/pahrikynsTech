@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { TEMPLATE_REGISTRY } from "../templates/templateRegistry";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import LockIcon from "@mui/icons-material/Lock";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 /** ========================================================
  * RESUME TEMPLATES — ULTRA PREMIUM DESIGN (v2)
@@ -17,9 +19,17 @@ const CATEGORIES = ["All", "Professional", "Modern", "Creative", "Executive", "M
 
 export default function ResumeTemplates() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
 
+  const isPro = user?.subscription?.status === "ACTIVE";
+
   const selectTemplate = (template) => {
+    if (template.type === "pro" && !isPro) {
+      // PRO template selected by non-pro user -> Redirect to upgrade
+      navigate("/pricing");
+      return;
+    }
     // Navigate to builder with selected template
     navigate(`/resume/builder/personal?template=${template.id}`);
   };
@@ -159,27 +169,53 @@ export default function ResumeTemplates() {
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm">
                       <motion.div
                         initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }} // This might not trigger perfectly on hover reuse
+                        whileInView={{ y: 0, opacity: 1 }}
                         className="flex flex-col gap-3 items-center"
                       >
-                        <Button
-                          variant="contained"
-                          sx={{
-                            bgcolor: "#00eaff",
-                            color: "black",
-                            fontWeight: "bold",
-                            textTransform: "none",
-                            px: 4,
-                            py: 1,
-                            borderRadius: 50,
-                            "&:hover": { bgcolor: "#00c4d6" }
-                          }}
-                        >
-                          Use Template
-                        </Button>
-                        <Typography variant="body2" className="text-white/80 font-medium">
-                          Click to Edit
-                        </Typography>
+                        {tpl.type === "pro" && !isPro ? (
+                          <>
+                            <Button
+                              variant="contained"
+                              startIcon={<LockIcon />}
+                              sx={{
+                                bgcolor: "#facc15",
+                                color: "black",
+                                fontWeight: "bold",
+                                textTransform: "none",
+                                px: 4,
+                                py: 1,
+                                borderRadius: 50,
+                                "&:hover": { bgcolor: "#eab308" }
+                              }}
+                            >
+                              Upgrade to PRO
+                            </Button>
+                            <Typography variant="body2" className="text-yellow-400 font-bold">
+                              Premium Template
+                            </Typography>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              variant="contained"
+                              sx={{
+                                bgcolor: "#00eaff",
+                                color: "black",
+                                fontWeight: "bold",
+                                textTransform: "none",
+                                px: 4,
+                                py: 1,
+                                borderRadius: 50,
+                                "&:hover": { bgcolor: "#00c4d6" }
+                              }}
+                            >
+                              Use Template
+                            </Button>
+                            <Typography variant="body2" className="text-white/80 font-medium">
+                              Click to Edit
+                            </Typography>
+                          </>
+                        )}
                       </motion.div>
                     </div>
 

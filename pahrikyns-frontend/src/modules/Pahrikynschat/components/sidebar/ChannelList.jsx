@@ -15,7 +15,7 @@ import useChannels from "../../hooks/useChannels";
  */
 
 export default function ChannelList() {
-  const { channels, loading } = useChannels();
+  const { channels, loading, error } = useChannels();
   const { firebaseUser, user: backendUser } = useAuth();
 
   // 🛡️ Fallback: Standardized user object
@@ -42,6 +42,9 @@ export default function ChannelList() {
 
   if (loading)
     return <Typography sx={{ px: 2, color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Loading channels…</Typography>;
+
+  if (error)
+    return <Typography sx={{ px: 2, color: "#ff4444", fontSize: 13 }}>Error: {error}</Typography>;
 
   return (
     <List sx={{ px: 1 }}>

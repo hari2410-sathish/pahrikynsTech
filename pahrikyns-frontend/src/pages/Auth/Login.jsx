@@ -128,7 +128,7 @@ export default function Login() {
         role: isAdmin ? "admin" : "user",
       });
 
-      login(res.data);
+      login(res.data?.data);
 
       if (isAdmin) {
         navigate("/admin/dashboard", { replace: true });
@@ -136,7 +136,13 @@ export default function Login() {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      showToast(err?.response?.data?.error || "Login failed");
+      // Handle the new standardized { success, message, errors } format
+      const data = err?.response?.data;
+      if (data?.errors && data.errors.length > 0) {
+        showToast(data.errors.map(e => e.message).join(", "));
+      } else {
+        showToast(data?.message || err?.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -242,7 +248,7 @@ export default function Login() {
                 onSuccess={async (credentialResponse) => {
                   try {
                     const res = await googleLogin(credentialResponse.credential);
-                    login(res.data);
+                    login(res.data?.data);
                     navigate(from, { replace: true });
                   } catch (err) {
                     showToast("Google Login Failed");

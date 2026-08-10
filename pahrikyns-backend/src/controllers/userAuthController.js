@@ -25,19 +25,15 @@ function safeEmit(req, event, payload) {
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-    const normalizedName = String(name || "").trim();
-
-    if (!normalizedName || !normalizedEmail || !password) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedName = String(name).trim();
 
     // Already registered?
     const exist = await prisma.user.findFirst({
       where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
     if (exist) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -59,7 +55,8 @@ exports.registerUser = async (req, res) => {
     } catch (mailErr) {
       console.error("OTP mail failed:", mailErr.message);
       return res.status(500).json({
-        error: "Unable to send OTP. Please try again later.",
+        success: false,
+        message: "Unable to send OTP. Please try again later.",
       });
     }
 
@@ -85,14 +82,17 @@ exports.registerUser = async (req, res) => {
       timestamp: new Date(),
     });
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: "OTP sent",
-      requiresOTP: true,
-      email: normalizedEmail,
+      data: {
+        requiresOTP: true,
+        email: normalizedEmail,
+      }
     });
   } catch (err) {
     console.error("registerUser error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, message: err.message || "Server error" });
   }
 };
 
@@ -102,28 +102,24 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-
-    if (!normalizedEmail || !password) {
-      return res.status(400).json({ error: "Email and password required" });
-    }
+    const normalizedEmail = String(email).trim().toLowerCase();
 
     const user = await prisma.user.findFirst({
       where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(400).json({ success: false, message: "User not found" });
     }
 
     if (!user.isVerified) {
       return res
         .status(403)
-        .json({ error: "Please verify your email before login" });
+        .json({ success: false, message: "Please verify your email before login" });
     }
 
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-      return res.status(400).json({ error: "Invalid password" });
+      return res.status(400).json({ success: false, message: "Invalid password" });
     }
 
     // Self-heal legacy mixed-case emails in DB.
@@ -167,20 +163,23 @@ exports.loginUser = async (req, res) => {
       timestamp: new Date(),
     });
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-      },
+      data: {
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+        }
+      }
     });
   } catch (err) {
     console.error("loginUser error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -190,11 +189,7 @@ exports.loginUser = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-
-    if (!normalizedEmail || !otp) {
-      return res.status(400).json({ error: "Missing email or OTP" });
-    }
+    const normalizedEmail = String(email).trim().toLowerCase();
 
     const otpHash = crypto
       .createHash("sha256")
@@ -209,18 +204,18 @@ exports.verifyOTP = async (req, res) => {
     });
 
     if (!record) {
-      return res.status(400).json({ error: "Invalid OTP" });
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
     }
 
     if (record.expiresAt < new Date()) {
-      return res.status(400).json({ error: "OTP expired" });
+      return res.status(400).json({ success: false, message: "OTP expired" });
     }
 
     const tempUser = await prisma.tempUser.findFirst({
       where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
     if (!tempUser) {
-      return res.status(400).json({ error: "Temp user not found" });
+      return res.status(400).json({ success: false, message: "Temp user not found" });
     }
 
     const user = await prisma.user.create({
@@ -252,20 +247,23 @@ exports.verifyOTP = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: "OTP verified successfully",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isVerified: true,
-        createdAt: user.createdAt,
-      },
+      data: {
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          isVerified: true,
+          createdAt: user.createdAt,
+        }
+      }
     });
   } catch (err) {
     console.error("verifyOTP error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -275,9 +273,6 @@ exports.verifyOTP = async (req, res) => {
 exports.googleLogin = async (req, res) => {
   try {
     const { token } = req.body;
-    if (!token) {
-      return res.status(400).json({ error: "Google token missing" });
-    }
 
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
@@ -285,9 +280,9 @@ exports.googleLogin = async (req, res) => {
     });
 
     const { email, name, picture } = ticket.getPayload();
-    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedEmail = String(email).trim().toLowerCase();
     if (!normalizedEmail) {
-      return res.status(400).json({ error: "Google email missing" });
+      return res.status(400).json({ success: false, message: "Google email missing" });
     }
 
     let user = await prisma.user.findFirst({
@@ -317,19 +312,22 @@ exports.googleLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: "Google login successful",
-      token: jwtToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-      },
+      data: {
+        token: jwtToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+        }
+      }
     });
   } catch (err) {
     console.error("Google Login Error:", err);
-    res.status(500).json({ error: "Google authentication failed" });
+    res.status(500).json({ success: false, message: "Google authentication failed" });
   }
 };

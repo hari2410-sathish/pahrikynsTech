@@ -144,7 +144,7 @@ export default function Register() {
 
       setForm((prev) => ({ ...prev, name: cleanName, email: cleanEmail }));
 
-      if (res.data?.requiresOTP) {
+      if (res.data?.data?.requiresOTP) {
         showToast("OTP sent to your email", "success");
         setStep(2);
       } else {
@@ -176,8 +176,8 @@ export default function Register() {
       });
 
       login({
-        token: res.data.token,
-        user: res.data.user,
+        token: res.data?.data?.token,
+        user: res.data?.data?.user,
       });
 
       navigate("/dashboard", { replace: true });
@@ -207,8 +207,8 @@ export default function Register() {
       );
 
       login({
-        token: res.data.token,
-        user: res.data.user,
+        token: res.data?.data?.token,
+        user: res.data?.data?.user,
       });
 
       navigate("/dashboard", { replace: true });

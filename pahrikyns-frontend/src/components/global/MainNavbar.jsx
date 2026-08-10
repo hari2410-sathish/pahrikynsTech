@@ -178,7 +178,7 @@ export default function MainNavbar() {
     py: 1,
     fontSize: "14px",
     borderRadius: 1,
-    color: "#3c16c7ff",
+    color: "#ffffff",
     fontWeight: 600,
     cursor: "pointer",
     textDecoration: "none",
@@ -234,7 +234,6 @@ export default function MainNavbar() {
             minHeight: `${NAV_HEIGHT}px !important`,
             px: { xs: 1, sm: 2, md: 3 },
             gap: { xs: 1, md: 1.5 },
-            overflow: "hidden",
           }}
         >
           {/* LEFT */}
@@ -252,14 +251,14 @@ export default function MainNavbar() {
                 }}
               >
                 <Typography sx={{ color: "#00eaff", fontWeight: 900, letterSpacing: '1px' }}>
-                  hari
+                  H
                 </Typography>
               </Avatar>
-              <Typography 
-                sx={{ 
-                  ml: 1.5, 
-                  color: theme === "dark" ? "#fff" : "#1a1a1a", 
-                  fontWeight: 800, 
+              <Typography
+                sx={{
+                  ml: 1.5,
+                  color: theme === "dark" ? "#fff" : "#1a1a1a",
+                  fontWeight: 800,
                   fontSize: 20,
                   letterSpacing: '0.05em',
                   background: theme === "dark" ? "linear-gradient(90deg, #fff, #00eaff)" : "inherit",
@@ -294,7 +293,7 @@ export default function MainNavbar() {
                 setOpen(false); // Close menu if navigating
               }}
             >
-              Courses 
+              Courses
             </Button>
 
             <Button component={Link} to="/blog" sx={navBtn}>
@@ -333,7 +332,7 @@ export default function MainNavbar() {
               setOpen(true);
             }}
           >
-           English
+            English
           </Button>
           <Box sx={{ flex: 1 }} />
 
@@ -407,44 +406,44 @@ export default function MainNavbar() {
                         boxShadow: "0 12px 50px rgba(0,0,0,0.9)",
                       }}
                     >
-                    <List dense sx={{ py: 0 }}>
-                      {searchResults.map((item, idx) => (
-                        <ListItemButton
-                          key={idx}
-                          component={Link}
-                          to={item.link}
-                          onClick={() => {
-                            setQuery("");
-                            setShowResults(false);
-                          }}
-                          sx={{
-                            borderBottom: "1px solid rgba(255,255,255,0.03)",
-                            "&:hover": {
-                              background: "rgba(0,234,255,0.08)",
-                            }
-                          }}
-                        >
-                          {item.icon && (
-                            <ListItemIcon sx={{ minWidth: 36, color: "#00eaff" }}>
-                              {item.icon}
-                            </ListItemIcon>
-                          )}
-                          <ListItemText
-                            primary={
-                              <Typography sx={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>
-                                {item.name}
-                              </Typography>
-                            }
-                            secondary={
-                              <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>
-                                {item.category}
-                              </Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      ))}
-                    </List>
-                  </Paper>
+                      <List dense sx={{ py: 0 }}>
+                        {searchResults.map((item, idx) => (
+                          <ListItemButton
+                            key={idx}
+                            component={Link}
+                            to={item.link}
+                            onClick={() => {
+                              setQuery("");
+                              setShowResults(false);
+                            }}
+                            sx={{
+                              borderBottom: "1px solid rgba(255,255,255,0.03)",
+                              "&:hover": {
+                                background: "rgba(0,234,255,0.08)",
+                              }
+                            }}
+                          >
+                            {item.icon && (
+                              <ListItemIcon sx={{ minWidth: 36, color: "#00eaff" }}>
+                                {item.icon}
+                              </ListItemIcon>
+                            )}
+                            <ListItemText
+                              primary={
+                                <Typography sx={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>
+                                  {item.name}
+                                </Typography>
+                              }
+                              secondary={
+                                <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>
+                                  {item.category}
+                                </Typography>
+                              }
+                            />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </Paper>
                   </Portal>
                 )}
               </Box>
@@ -521,7 +520,19 @@ export default function MainNavbar() {
                   </Avatar>
 
                   {profileOpen && (
-                    <Paper sx={{ position: "absolute", right: 0, top: "46px", p: 1 }}>
+                    <Paper 
+                      sx={{ 
+                        position: "absolute", 
+                        right: 0, 
+                        top: "46px", 
+                        p: 1, 
+                        minWidth: 160,
+                        background: "rgba(4,16,38,0.98)",
+                        border: "1px solid rgba(0,234,255,0.2)",
+                        backdropFilter: "blur(20px)",
+                        boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
+                      }}
+                    >
                       <Box component={Link} to="/dashboard" sx={profileItemStyle}>
                         Dashboard
                       </Box>
@@ -542,7 +553,7 @@ export default function MainNavbar() {
 
             <IconButton
               sx={{ display: { xs: "inline-flex", lg: "none" } }}
-              onClick={() => setDrawer(true)}
+              onClick={() => setDrawer((prev) => !prev)}
             >
               <MenuIcon />
             </IconButton>
@@ -557,13 +568,14 @@ export default function MainNavbar() {
           active === "resume"
             ? resumeBtnRef.current
             : active === "english"
-            ? englishBtnRef.current
-            : coursesBtnRef.current
+              ? englishBtnRef.current
+              : coursesBtnRef.current
         }
         placement="bottom-start"
         modifiers={[{ name: "offset", options: { offset: [0, 15] } }]}
         onMouseEnter={() => clearCloseTimer()}
         onMouseLeave={() => startCloseTimer()}
+        sx={{ zIndex: 9999 }}
       >
 
         <ClickAwayListener onClickAway={closeMenu}>
@@ -654,8 +666,8 @@ export default function MainNavbar() {
               {(active === "resume"
                 ? RESUME_MENU.items
                 : active === "english"
-                ? ENGLISH_MENU.items
-                : MENU[active]?.items
+                  ? ENGLISH_MENU.items
+                  : MENU[active]?.items
               )?.map((it, i) => (
 
                 <Box
@@ -710,7 +722,7 @@ export default function MainNavbar() {
       </Popper>
 
       {/* MOBILE DRAWER */}
-      <Drawer anchor="left" open={drawer} onClose={() => setDrawer(false)}>
+      <Drawer anchor="left" open={drawer} onClose={() => setDrawer(false)} sx={{ zIndex: 2001 }}>
         <Box
           sx={{
             width: 280,
@@ -727,28 +739,28 @@ export default function MainNavbar() {
 
           {/* Theme & Profile quick actions in mobile drawer */}
           <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-             <Button 
-               fullWidth 
-               variant="outlined" 
-               startIcon={theme === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-               onClick={toggleTheme}
-               sx={{ 
-                 borderColor: theme === "dark" ? "rgba(0,234,255,0.2)" : "rgba(0,0,0,0.2)", 
-                 color: theme === "dark" ? "#fff" : "#333", 
-                 textTransform: "none" 
-               }}
-             >
-               {theme === "dark" ? "Light" : "Dark"}
-             </Button>
-             <Button 
-               fullWidth 
-               variant="outlined" 
-               startIcon={<ChatBubbleOutlineIcon />}
-               onClick={() => { navigate("/chat"); setDrawer(false); }}
-               sx={{ borderColor: "rgba(0,234,255,0.2)", color: "#fff", textTransform: "none" }}
-             >
-               Chat
-             </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={theme === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+              onClick={toggleTheme}
+              sx={{
+                borderColor: theme === "dark" ? "rgba(0,234,255,0.2)" : "rgba(0,0,0,0.2)",
+                color: theme === "dark" ? "#fff" : "#333",
+                textTransform: "none"
+              }}
+            >
+              {theme === "dark" ? "Light" : "Dark"}
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<ChatBubbleOutlineIcon />}
+              onClick={() => { navigate("/chat"); setDrawer(false); }}
+              sx={{ borderColor: "rgba(0,234,255,0.2)", color: "#fff", textTransform: "none" }}
+            >
+              Chat
+            </Button>
           </Box>
 
           {/* MOBILE UNIVERSAL SEARCH */}
@@ -771,28 +783,28 @@ export default function MainNavbar() {
               sx={{ color: theme === "dark" ? "#fff" : "#333", width: "100%" }}
             />
           </Box>
-          
+
           {/* MOBILE SEARCH RESULTS */}
           {query.trim() !== "" && searchResults.length > 0 && (
-             <Box sx={{ mb: 2, background: theme === "dark" ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.02)", borderRadius: 2, overflow: "hidden" }}>
-                <Typography sx={{ color: theme === "dark" ? "#00eaff" : "primary.main", fontSize: 12, px: 2, pt: 1, pb: 0.5, fontWeight: "bold" }}>SEARCH RESULTS</Typography>
-                <List dense>
-                  {searchResults.slice(0, 5).map((item, idx) => (
-                    <ListItemButton
-                      key={`mob-${idx}`}
-                      component={Link}
-                      to={item.link}
-                      onClick={() => { setDrawer(false); setQuery(""); }}
-                      sx={{ borderBottom: theme === "dark" ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)" }}
-                    >
-                      <ListItemText 
-                        primary={<Typography sx={{color: theme === "dark" ? "#fff" : "#333", fontSize: 13}}>{item.name}</Typography>} 
-                        secondary={<Typography sx={{color: theme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", fontSize: 11}}>{item.category}</Typography>} 
-                      />
-                    </ListItemButton>
-                  ))}
-                </List>
-             </Box>
+            <Box sx={{ mb: 2, background: theme === "dark" ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.02)", borderRadius: 2, overflow: "hidden" }}>
+              <Typography sx={{ color: theme === "dark" ? "#00eaff" : "primary.main", fontSize: 12, px: 2, pt: 1, pb: 0.5, fontWeight: "bold" }}>SEARCH RESULTS</Typography>
+              <List dense>
+                {searchResults.slice(0, 5).map((item, idx) => (
+                  <ListItemButton
+                    key={`mob-${idx}`}
+                    component={Link}
+                    to={item.link}
+                    onClick={() => { setDrawer(false); setQuery(""); }}
+                    sx={{ borderBottom: theme === "dark" ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)" }}
+                  >
+                    <ListItemText
+                      primary={<Typography sx={{ color: theme === "dark" ? "#fff" : "#333", fontSize: 13 }}>{item.name}</Typography>}
+                      secondary={<Typography sx={{ color: theme === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", fontSize: 11 }}>{item.category}</Typography>}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Box>
           )}
 
           {query.trim() === "" && Object.entries(MENU).map(([key, cat]) => (
@@ -818,10 +830,10 @@ export default function MainNavbar() {
             <Box sx={{ mt: 1 }}>
               <Typography sx={{ color: theme === "dark" ? "#00eaff" : "primary.main", fontWeight: 800 }}>🇬🇧 English</Typography>
               {ENGLISH_MENU.items.map((it, i) => (
-                <ListItemButton 
-                  key={i} 
-                  component={Link} 
-                  to={it.link} 
+                <ListItemButton
+                  key={i}
+                  component={Link}
+                  to={it.link}
                   onClick={() => setDrawer(false)}
                   sx={{ color: theme === "dark" ? "inherit" : "#333" }}
                 >

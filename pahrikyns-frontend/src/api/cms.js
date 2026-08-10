@@ -1,21 +1,16 @@
-import axios from "axios";
-
-// Standard Public API instance
-const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/cms`,
-});
+import API from "./axios";
 
 export const fetchPublicBlogPosts = async () => {
-  const res = await api.get("/blog");
+  const res = await API.get("/api/cms/blog");
   return res.data;
 };
 
 export const fetchPublicBlogPostBySlug = async (slug) => {
-  const res = await api.get(`/blog/${slug}`);
+  const res = await API.get(`/api/cms/blog/${slug}`);
   return res.data;
 };
 
 export const fetchPublicWebPageBySlug = async (slug) => {
-  const res = await api.get(`/page/${slug}`);
+  const res = await API.get(`/api/cms/page/${slug}`);
   return res.data;
 };

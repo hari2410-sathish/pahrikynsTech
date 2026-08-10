@@ -37,6 +37,42 @@ export const verifyPayment = async (payload) => {
 };
 
 /* =========================================
+   ✅ CREATE SUBSCRIPTION PAYMENT + RAZORPAY ORDER (USER)
+========================================= */
+export const createSubscriptionPayment = async (planId, price) => {
+  try {
+    const res = await API.post("/payments/subscription/create", {
+      planId,
+      price,
+    });
+
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error("createSubscriptionPayment error:", err);
+    return {
+      ok: false,
+      error: err.response?.data?.error || err.message,
+    };
+  }
+};
+
+/* =========================================
+   ✅ VERIFY SUBSCRIPTION PAYMENT (SIGNATURE)
+========================================= */
+export const verifySubscriptionPayment = async (payload) => {
+  try {
+    const res = await API.post("/payments/subscription/verify", payload);
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error("verifySubscriptionPayment error:", err);
+    return {
+      ok: false,
+      error: err.response?.data?.error || err.message,
+    };
+  }
+};
+
+/* =========================================
    ✅ GET MY PAYMENTS (USER)
 ========================================= */
 export const getMyPayments = async () => {
